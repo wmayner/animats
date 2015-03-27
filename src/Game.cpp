@@ -5,19 +5,26 @@
  *  Created by Arend on 9/23/10.
  */
 
-#include "Game.h"
 #include <math.h>
 
-#define KISSRND (((((rndZ=36969*(rndZ&65535)+(rndZ>>16))<<16)+(rndW=18000*(rndW&65535)+(rndW>>16)) )^(rndY=69069*rndY+1234567))+(rndX^=(rndX<<17), rndX^=(rndX>>13), rndX^=(rndX<<5)))
-#define INTABS(number) (((((0x80)<<((sizeof(int)-1)<<3))&number) ? (~number)+1 : number))
+#include "Game.h"
 
-#define randDouble ((double)rand()/(double)RAND_MAX)
+#define KISSRND (                                                        \
+    ((((rndZ = 36969 * (rndZ & 65535) + (rndZ >> 16)) << 16) +           \
+      (rndW = 18000 * (rndW & 65535) + (rndW >> 16)) )                   \
+     ^(rndY = 69069 * rndY + 1234567)) +                                 \
+    (rndX ^= (rndX << 17), rndX ^= (rndX >> 13), rndX ^= (rndX << 5))    \
+)
+#define INTABS(number) (((((0x80) << ((sizeof(int) - 1) << 3)) & number) \
+            ? (~number) + 1 : number))
 
-int rndX,rndY,rndZ,rndW;
+#define randDouble ((double)rand() / (double)RAND_MAX)
+
+int rndX, rndY, rndZ, rndW;
 
 
-Game::Game(char* filename){
-    FILE *f = fopen(filename,"r+w");
+Game::Game(char* filename) {
+    FILE *f = fopen(filename, "r+w");
     int i;
     patterns.clear();
     while (!feof(f)) {
@@ -27,36 +34,37 @@ Game::Game(char* filename){
     fclose(f);
 }
 
-Game::~Game() {
-}
+Game::~Game() {}
 
-double Game::agentDependentRandDouble(void){
+double Game::agentDependentRandDouble(void) {
     int A = KISSRND;
     return (double)((INTABS(A)) & 65535) / (double)65535;
 }
 
-int Game::agentDependentRandInt(void){
+int Game::agentDependentRandInt(void) {
     int A = KISSRND;
     return (INTABS(A));
 }
 
-void Game::applyNoise(Agent *agent,double sensorNoise) {
+void Game::applyNoise(Agent *agent, double sensorNoise) {
     // Larissa: If I don't have noise in evaluation, then I can just use random
     // numbers always.
     // if (agentDependentRandDouble() < sensorNoise) {
-    if (randDouble<sensorNoise) {
+    if (randDouble < sensorNoise) {
         agent->states[0] = !agent->states[0];
     }
     // if (agentDependentRandDouble() < sensorNoise)
-    if (randDouble<sensorNoise)
+    if (randDouble < sensorNoise) {
         agent->states[1] = !agent->states[1];
+    }
 }
 
 void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
     int world, botPos, blockPos;
     int i, j, k, l, m;
     int action;
-    rndW = agent->ID + repeat; // make random seeds unique from one another by including index
+    // Make random seeds unique from one another by including index.
+    rndW = agent->ID + repeat;
     rndX = ~(agent->ID+repeat);
     rndY = (agent->ID + repeat)^0b01010101010101010101010101010101;
     rndZ = (agent->ID + repeat)^0b10101010101010101010101010101010;
@@ -75,13 +83,13 @@ void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
     // Block sizes
     for (i = 0; i < patterns.size(); i++) {
         // Directions
-        for (j = -1; j < 2; j+=2){
+        for (j = -1; j < 2; j+=2) {
             // Block fall
             for (k = 0; k < 16; k++) {
                 // Larissa: Change environment after 30,000 Gen, if patterns is
                 // 1 7 15 3 it changes from 2 blocks with 1 7 to 4 blocks with
                 // 1 7 15 3
-                world=patterns[i];
+                world = patterns[i];
                 // if (agent->born > nowUpdate || i < 2) {
                 // if (agent->born > nowUpdate) {
                 //     world = patterns[i];
@@ -112,8 +120,8 @@ void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
                     // Set motors to 0 to prevent reading from them.
                     agent->states[6] = 0; agent->states[7] = 0;
                     agent->updateStates();
-                    //Larissa: limit to one motor.
-                    //agent->states[7]=0;
+                    // Larissa: limit to one motor.
+                    // agent->states[7]=0;
                     // if (agent->born < nowUpdate) {
                     //     agent->states[7] = 0;
                     // }
@@ -122,7 +130,7 @@ void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
                     // Move animat
                     // Larissa: this makes the animat stop moving:
                     // action = 0;
-                    switch(action) {
+                    switch (action) {
                         // No motors on.
                         case 0:
                             // Don't move.
@@ -162,6 +170,7 @@ void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
                 }
 
                 if ((i & 1) == 0) {
+                    // TODO(wmayner) replace 1.01s with constant
                     if (hit) {
                         agent->correct++;
                         agent->fitness *= 1.01;
@@ -180,11 +189,10 @@ void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
                         agent->differentialCorrects[i]++;
                     }
                 }
-            } // Block fall
-        } // Directions
-    } // Block sizes
-} // executeGame
-
+            }  // Block fall
+        }  // Directions
+    }  // Block sizes
+}  // executeGame
 
 vector<vector<int> > Game::executeGameLogStates(Agent* agent, double sensorNoise){
     int world, botPos, blockPos;
@@ -404,7 +412,6 @@ void Game::analyseKO(Agent* agent,int which, int setTo,double sensorNoise){
     }
 }
 
-
 double Game::mutualInformation(vector<int> A,vector<int>B){
     set<int> nrA,nrB;
     set<int>::iterator aI,bI;
@@ -479,6 +486,7 @@ double Game::ei(vector<int> A,vector<int> B,int theMask){
                 I+=pXY[*aI][*bI]*log2(pXY[*aI][*bI]/(pY[*bI]));
     return -I;
 }
+
 double Game::computeAtomicPhi(vector<int>A,int states){
     int i;
     double P,EIsystem;
@@ -497,8 +505,6 @@ double Game::computeAtomicPhi(vector<int>A,int states){
 //  cout<<-EIsystem+P<<" "<<EIsystem<<" "<<P<<" "<<T0.size()<<" "<<T1.size()<<endl;
     return -EIsystem+P;
 }
-
-
 
 double Game::computeR(vector<vector<int> > table,int howFarBack){
     double Iwh,Iws,Ish,Hh,Hs,Hw,Hhws,delta,R;
@@ -550,6 +556,7 @@ double Game::nonPredictiveI(vector<int>A){
     }
     return entropy(I)-mutualInformation(S, I);
 }
+
 double Game::predictNextInput(vector<int>A){
     vector<int> S,I;
     S.clear(); I.clear();
@@ -561,7 +568,6 @@ double Game::predictNextInput(vector<int>A){
     I.erase(I.begin()+I.size()-1);
     return mutualInformation(S, I);
 }
-
 
 void Game::represenationPerNodeSummary(Agent* agent,char* filename,double sensorNoise){
     vector<vector<int> > table=executeGameLogStates(agent,sensorNoise);
