@@ -1,8 +1,8 @@
 CPP=c++
 # Use `python3.4-config --ldflags` and `python3.4-config --cflags` to get the
 # flags needed to use Python from within C++.
-CPPFLAGS=-I/usr/local/Cellar/python3/3.4.3/Frameworks/Python.framework/Versions/3.4/include/python3.4m -I/usr/local/Cellar/python3/3.4.3/Frameworks/Python.framework/Versions/3.4/include/python3.4m -Wno-unused-result -fno-common -dynamic -DNDEBUG -g -fwrapv -O3 -Wall -Wstrict-prototypes -I/usr/local/include -I/usr/local/opt/sqlite/include
-LDFLAGS=-L/usr/local/Cellar/python3/3.4.3/Frameworks/Python.framework/Versions/3.4/lib/python3.4/config-3.4m -lpython3.4m -ldl -framework CoreFoundation
+CPPFLAGS=$(shell python3.4-config --cflags)
+LDFLAGS=$(shell python3.4-config --ldflags)
 
 SRC=src/*.cpp
 BUILD=build/main.o
