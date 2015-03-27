@@ -36,7 +36,6 @@ int main(int argc, char *argv[]) {
     int i, j, who = 0;
     Game *game;
     double maxFitness;
-    FILE *resFile;
     FILE *LOD;
     FILE *genomeFile;
     LOD = fopen(argv[2], "w+t");

@@ -3,8 +3,6 @@
  *  HMMBrain
  *
  *  Created by Arend on 9/23/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
- *
  */
 
 #include "Game.h"
@@ -19,164 +17,192 @@ int rndX,rndY,rndZ,rndW;
 
 
 Game::Game(char* filename){
-    FILE *f=fopen(filename,"r+w");
-    int i,j;
+    FILE *f = fopen(filename,"r+w");
+    int i;
     patterns.clear();
-    while(!feof(f)){
-        fscanf(f,"%i  ",&i);
+    while (!feof(f)) {
+        fscanf(f, "%i  ", &i);
         patterns.push_back(i&65535);
     }
     fclose(f);
 }
 
-Game::~Game(){
+Game::~Game() {
 }
 
 double Game::agentDependentRandDouble(void){
-    int A=KISSRND;
-    return (double)((INTABS(A))&65535)/(double)65535;
+    int A = KISSRND;
+    return (double)((INTABS(A)) & 65535) / (double)65535;
 }
+
 int Game::agentDependentRandInt(void){
-    int A=KISSRND;
+    int A = KISSRND;
     return (INTABS(A));
 }
 
-
-void Game::applyNoise(Agent *agent,double sensorNoise){
-    //if(agentDependentRandDouble()<sensorNoise){
-    if(randDouble<sensorNoise)  //Larissa: If I don't have noise in evaluation, then I can just use random numbers always
-          agent->states[0]=!agent->states[0];
-    //if(agentDependentRandDouble()<sensorNoise)
-    if(randDouble<sensorNoise)
-        agent->states[1]=!agent->states[1];
+void Game::applyNoise(Agent *agent,double sensorNoise) {
+    // Larissa: If I don't have noise in evaluation, then I can just use random
+    // numbers always.
+    // if (agentDependentRandDouble() < sensorNoise) {
+    if (randDouble<sensorNoise) {
+        agent->states[0] = !agent->states[0];
+    }
+    // if (agentDependentRandDouble() < sensorNoise)
+    if (randDouble<sensorNoise)
+        agent->states[1] = !agent->states[1];
 }
 
-void Game::executeGame(Agent* agent,FILE *f,double sensorNoise, int repeat){
-    int world,botPos,blockPos;
-    int i,j,k,l,m;
-    unsigned char W;
+void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
+    int world, botPos, blockPos;
+    int i, j, k, l, m;
     int action;
-    rndW=agent->ID+repeat; // make random seeds unique from one another by including index
-	rndX=~(agent->ID+repeat);
-	rndY=(agent->ID+repeat)^0b01010101010101010101010101010101;
-	rndZ=(agent->ID+repeat)^0b10101010101010101010101010101010;
-    //cout<<rndZ<<endl;
+    rndW = agent->ID + repeat; // make random seeds unique from one another by including index
+    rndX = ~(agent->ID+repeat);
+    rndY = (agent->ID + repeat)^0b01010101010101010101010101010101;
+    rndZ = (agent->ID + repeat)^0b10101010101010101010101010101010;
 
-    agent->fitness=1.0;
-    agent->correct=agent->incorrect=0;
+    agent->fitness = 1.0;
+    agent->correct = agent->incorrect = 0;
+
     bool hit;
+
     agent->differentialCorrects.resize(patterns.size());
-    for(i=0;i<agent->differentialCorrects.size();i++)
-        agent->differentialCorrects[i]=0;
-    for(i=0;i<patterns.size();i++){
-        for(j=-1;j<2;j+=2){
-            for(k=0;k<16;k++){
-                //Larissa: Change environment after 30,000 Gen, if patterns is 1 7 15 3 it changes
-                //from 2 blocks with 1 7 to 4 blocks with 1 7 15 3
-                //if (agent->born > nowUpdate || i<2){
-//                if (agent->born > nowUpdate){
-                    world=patterns[i];
-//                    //cout<<world<<endl;
-//                } else{
-//                    //world=patterns[i-2];
-//                    if (i == 0 || i == 2) world=7;
-//                    else if (i==1 || i == 3) world=15;
-//                    //cout<<world<<endl;
-//                }
+
+    for (i = 0; i < agent->differentialCorrects.size(); i++) {
+        agent->differentialCorrects[i] = 0;
+    }
+
+    // Block sizes
+    for (i = 0; i < patterns.size(); i++) {
+        // Directions
+        for (j = -1; j < 2; j+=2){
+            // Block fall
+            for (k = 0; k < 16; k++) {
+                // Larissa: Change environment after 30,000 Gen, if patterns is
+                // 1 7 15 3 it changes from 2 blocks with 1 7 to 4 blocks with
+                // 1 7 15 3
+                world=patterns[i];
+                // if (agent->born > nowUpdate || i < 2) {
+                // if (agent->born > nowUpdate) {
+                //     world = patterns[i];
+                // } else{
+                //     // world = patterns[i-2];
+                //     if (i == 0 || i == 2) world = 7;
+                //     else if (i==1 || i == 3) world = 15;
+                // }
                 agent->resetBrain();
-                botPos=k;
-                blockPos=0;
-                //loop the world
-                for(l=0;l<loopTicks;l++){
-//                    for(m=0;m<16;m++)
-//                        printf("%i",(world>>m)&1);
-//                    printf("\n");
-                    //AH: Sensors have no noise in them now
-                    agent->states[0]=(world>>botPos)&1;
-//                    agent->states[1]=0;
+                botPos = k;
+                blockPos = 0;
+                // World loop
+                for (l = 0; l < loopTicks; l++) {
+                    // for(m=0;m<16;m++)
+                    //     printf("%i",(world>>m)&1);
+                    // printf("\n");
+                    // AH: Sensors have no noise in them now.
+                    agent->states[0] = (world >> botPos) & 1;
+                    // agent->states[1] = 0;
                     agent->states[1]=(world>>((botPos+2)&15))&1;
-                    //Larissa: Set to 0 to evolve animats with just one sensor
-//                    if (agent->born > nowUpdate){
-//                        agent->states[0]=0;
-//                        agent->states[1]=(world>>((botPos+2)&15))&1;
-//                    }
-                    //AH: apply noise does apply noise to them now
+                    // Larissa: Set to 0 to evolve animats with just one sensor.
+                    // if (agent->born > nowUpdate) {
+                    //     agent->states[0] = 0;
+                    //     agent->states[1] = (world >> ((botPos + 2) & 15)) & 1;
+                    // }
+                    // AH: Apply noise does apply noise to them now.
                     applyNoise(agent, sensorNoise);
-                    // set motors to 0 to preven reading from them
-                    agent->states[6]=0; agent->states[7]=0;
+                    // Set motors to 0 to prevent reading from them.
+                    agent->states[6] = 0; agent->states[7] = 0;
                     agent->updateStates();
-                    //Larissa: limit to one Motor
+                    //Larissa: limit to one motor.
                     //agent->states[7]=0;
-//                    if (agent->born < nowUpdate){
-//                        agent->states[7]=0;
-//                    }
-                    action=agent->states[6]+(agent->states[7]<<1);
-                   // action=0; //Larissa: this makes the animat stop moving
-                    switch(action){
+                    // if (agent->born < nowUpdate) {
+                    //     agent->states[7] = 0;
+                    // }
+                    action = agent->states[6] + (agent->states[7] << 1);
+
+                    // Move animat
+                    // Larissa: this makes the animat stop moving:
+                    // action = 0;
+                    switch(action) {
+                        // No motors on.
                         case 0:
-                        case 3:// nothing!
+                            // Don't move.
                             break;
+                        // Both motors on.
+                        case 3:
+                            // Don't move.
+                            break;
+                        // Left motor on.
                         case 1:
-                            botPos=(botPos+1)&15;
+                            // Move right.
+                            // TODO(wmayner) replace with constant
+                            botPos = (botPos + 1) & 15;
                             break;
+                        // Right motor on.
                         case 2:
-                            botPos=(botPos-1)&15;
+                            // Move left.
+                            // TODO(wmayner) replace with constant
+                            botPos = (botPos - 1) & 15;
                             break;
                     }
-                    if(j==-1){
-                        world=((world>>1)&65535)+((world&1)<<15);
+
+                    // TODO(wmayner) document what the hell these bithacks do
+                    if (j == -1) {
+                        world = ((world >> 1) & 65535) + ((world & 1) << 15);
                     } else {
-                        world=((world<<1)&65535)+((world>>15)&1);
+                        world = ((world << 1) & 65535) + ((world >> 15) & 1);
                     }
                 }
-                //check for hit
-                hit=false;
-                for(m=0;m<3;m++)
-                    if(((world>>((botPos+m)&15))&1)==1)
-                        hit=true;
-                if((i&1)==0){
-                    if(hit){
+
+                // Check for hit.
+                hit = false;
+                for (m = 0; m < 3; m++) {
+                    if (((world >> ((botPos + m) & 15)) & 1) == 1) {
+                        hit = true;
+                    }
+                }
+
+                if ((i & 1) == 0) {
+                    if (hit) {
                         agent->correct++;
-                        agent->fitness*=1.01;
+                        agent->fitness *= 1.01;
                         agent->differentialCorrects[i]++;
                     } else {
-                        agent->fitness/=1.01;
+                        agent->fitness /= 1.01;
                         agent->incorrect++;
                     }
                 } else {
-                    if(hit){
+                    if (hit) {
                         agent->incorrect++;
-                        agent->fitness/=1.01;
+                        agent->fitness /= 1.01;
                     } else {
                         agent->correct++;
-                        agent->fitness*=1.01;
+                        agent->fitness *= 1.01;
                         agent->differentialCorrects[i]++;
                     }
                 }
-            }
-        }
+            } // Block fall
+        } // Directions
+    } // Block sizes
+} // executeGame
 
-    }
-}
-vector<vector<int> > Game::executeGameLogStates(Agent* agent,double sensorNoise){
-    int world,botPos,blockPos;
-    int i,j,k,l,m,T0,T1,u;
-    unsigned char W;
-    int action;
-  	vector<vector<int> > retValue;
-    agent->fitness=1.0;
-    agent->correct=agent->incorrect=0;
-    rndW=agent->ID; // make random seeds unique from one another by including index
-	rndX=~agent->ID;
-	rndY=agent->ID^0b01010101010101010101010101010101;
-	rndZ=agent->ID^0b10101010101010101010101010101010;
+
+vector<vector<int> > Game::executeGameLogStates(Agent* agent, double sensorNoise){
+    int world, botPos, blockPos;
+    int i, j, k, l, m, T0, T1, u;
+    vector< vector<int> > retValue;
+    agent->fitness = 1.0;
+    agent->correct = agent->incorrect = 0;
+    rndW=agent->ID;  // Make random seeds unique from one another by including index.
+    rndX=~agent->ID;
+    rndY=agent->ID^0b01010101010101010101010101010101;
+    rndZ=agent->ID^0b10101010101010101010101010101010;
     bool hit;
     retValue.clear();
     retValue.resize(6);
-    for(i=0;i<patterns.size();i++){
-        for(j=-1;j<2;j+=2){
-            for(k=0;k<16;k++){
-                //Larissa: Change environment after 30,000 Gen
+    for (i = 0; i < patterns.size(); i++) {
+        for (j = -1; j < 2; j+=2) {
+            for (k = 0; k < 16; k++) {
+                //Larissa: Change environment after 30,000 Gen.
                 //if (agent->born > nowUpdate || i<2){
 //                if (agent->born > nowUpdate){
                    world=patterns[i];
@@ -211,13 +237,13 @@ vector<vector<int> > Game::executeGameLogStates(Agent* agent,double sensorNoise)
                     // set motors to 0 to preven reading from them
                     agent->states[6]=0; agent->states[7]=0;
                     T0=0;
-					for(u=0;u<8;u++)
-						T0|=(agent->states[u]&1)<<u;
-					agent->updateStates();
+                    for(u=0;u<8;u++)
+                        T0|=(agent->states[u]&1)<<u;
+                    agent->updateStates();
                     T1=0;
-					for(u=0;u<8;u++)
-						T1|=(agent->states[u]&1)<<u;
-					int action=(agent->states[maxNodes-1])+(agent->states[maxNodes-2]<<1);
+                    for(u=0;u<8;u++)
+                        T1|=(agent->states[u]&1)<<u;
+                    int action=(agent->states[maxNodes-1])+(agent->states[maxNodes-2]<<1);
                     retValue[0].push_back(T0);
                     retValue[1].push_back(T1);
                     int W=i<<1;
@@ -282,14 +308,13 @@ vector<vector<int> > Game::executeGameLogStates(Agent* agent,double sensorNoise)
 void Game::analyseKO(Agent* agent,int which, int setTo,double sensorNoise){
     int world,botPos,blockPos;
     int i,j,k,l,m;
-    unsigned char W;
     int action;
     agent->fitness=1.0;
     agent->correct=agent->incorrect=0;
     rndW=agent->ID; // make random seeds unique from one another by including index
-	rndX=~agent->ID;
-	rndY=agent->ID^0b01010101010101010101010101010101;
-	rndZ=agent->ID^0b10101010101010101010101010101010;
+    rndX=~agent->ID;
+    rndY=agent->ID^0b01010101010101010101010101010101;
+    rndZ=agent->ID^0b10101010101010101010101010101010;
     bool hit;
     for(i=0;i<patterns.size();i++){
         for(j=-1;j<2;j+=2){
@@ -381,113 +406,113 @@ void Game::analyseKO(Agent* agent,int which, int setTo,double sensorNoise){
 
 
 double Game::mutualInformation(vector<int> A,vector<int>B){
-	set<int> nrA,nrB;
-	set<int>::iterator aI,bI;
-	map<int,map<int,double> > pXY;
-	map<int,double> pX,pY;
-	int i,j;
-	double c=1.0/(double)A.size();
-	double I=0.0;
-	for(i=0;i<A.size();i++){
-		nrA.insert(A[i]);
-		nrB.insert(B[i]);
-		pX[A[i]]=0.0;
-		pY[B[i]]=0.0;
-	}
-	for(aI=nrA.begin();aI!=nrA.end();aI++)
-		for(bI=nrB.begin();bI!=nrB.end();bI++){
-			pXY[*aI][*bI]=0.0;
-		}
-	for(i=0;i<A.size();i++){
-		pXY[A[i]][B[i]]+=c;
-		pX[A[i]]+=c;
-		pY[B[i]]+=c;
-	}
-	for(aI=nrA.begin();aI!=nrA.end();aI++)
-		for(bI=nrB.begin();bI!=nrB.end();bI++)
-			if((pX[*aI]!=0.0)&&(pY[*bI]!=0.0)&&(pXY[*aI][*bI]!=0.0))
-				I+=pXY[*aI][*bI]*log2(pXY[*aI][*bI]/(pX[*aI]*pY[*bI]));
-	return I;
+    set<int> nrA,nrB;
+    set<int>::iterator aI,bI;
+    map<int,map<int,double> > pXY;
+    map<int,double> pX,pY;
+    int i;
+    double c=1.0/(double)A.size();
+    double I=0.0;
+    for(i=0;i<A.size();i++){
+        nrA.insert(A[i]);
+        nrB.insert(B[i]);
+        pX[A[i]]=0.0;
+        pY[B[i]]=0.0;
+    }
+    for(aI=nrA.begin();aI!=nrA.end();aI++)
+        for(bI=nrB.begin();bI!=nrB.end();bI++){
+            pXY[*aI][*bI]=0.0;
+        }
+    for(i=0;i<A.size();i++){
+        pXY[A[i]][B[i]]+=c;
+        pX[A[i]]+=c;
+        pY[B[i]]+=c;
+    }
+    for(aI=nrA.begin();aI!=nrA.end();aI++)
+        for(bI=nrB.begin();bI!=nrB.end();bI++)
+            if((pX[*aI]!=0.0)&&(pY[*bI]!=0.0)&&(pXY[*aI][*bI]!=0.0))
+                I+=pXY[*aI][*bI]*log2(pXY[*aI][*bI]/(pX[*aI]*pY[*bI]));
+    return I;
 
 }
 
 double Game::entropy(vector<int> list){
-	map<int, double> p;
-	map<int,double>::iterator pI;
-	int i;
-	double H=0.0;
-	double c=1.0/(double)list.size();
-	for(i=0;i<list.size();i++)
-		p[list[i]]+=c;
-	for (pI=p.begin();pI!=p.end();pI++) {
-			H+=p[pI->first]*log2(p[pI->first]);
-	}
-	return -1.0*H;
+    map<int, double> p;
+    map<int,double>::iterator pI;
+    int i;
+    double H=0.0;
+    double c=1.0/(double)list.size();
+    for(i=0;i<list.size();i++)
+        p[list[i]]+=c;
+    for (pI=p.begin();pI!=p.end();pI++) {
+            H+=p[pI->first]*log2(p[pI->first]);
+    }
+    return -1.0*H;
 }
 
 double Game::ei(vector<int> A,vector<int> B,int theMask){
-	set<int> nrA,nrB;
-	set<int>::iterator aI,bI;
-	map<int,map<int,double> > pXY;
-	map<int,double> pX,pY;
-	int i,j;
-	double c=1.0/(double)A.size();
-	double I=0.0;
-	for(i=0;i<A.size();i++){
-		nrA.insert(A[i]&theMask);
-		nrB.insert(B[i]&theMask);
-		pX[A[i]&theMask]=0.0;
-		pY[B[i]&theMask]=0.0;
-	}
-	for(aI=nrA.begin();aI!=nrA.end();aI++)
-		for(bI=nrB.begin();bI!=nrB.end();bI++){
-			pXY[*aI][*bI]=0.0;
-		}
-	for(i=0;i<A.size();i++){
-		pXY[A[i]&theMask][B[i]&theMask]+=c;
-		pX[A[i]&theMask]+=c;
-		pY[B[i]&theMask]+=c;
-	}
-	for(aI=nrA.begin();aI!=nrA.end();aI++)
-		for(bI=nrB.begin();bI!=nrB.end();bI++)
-			if((pX[*aI]!=0.0)&&(pY[*bI]!=0.0)&&(pXY[*aI][*bI]!=0.0))
-				I+=pXY[*aI][*bI]*log2(pXY[*aI][*bI]/(pY[*bI]));
-	return -I;
+    set<int> nrA,nrB;
+    set<int>::iterator aI,bI;
+    map<int,map<int,double> > pXY;
+    map<int,double> pX,pY;
+    int i;
+    double c=1.0/(double)A.size();
+    double I=0.0;
+    for(i=0;i<A.size();i++){
+        nrA.insert(A[i]&theMask);
+        nrB.insert(B[i]&theMask);
+        pX[A[i]&theMask]=0.0;
+        pY[B[i]&theMask]=0.0;
+    }
+    for(aI=nrA.begin();aI!=nrA.end();aI++)
+        for(bI=nrB.begin();bI!=nrB.end();bI++){
+            pXY[*aI][*bI]=0.0;
+        }
+    for(i=0;i<A.size();i++){
+        pXY[A[i]&theMask][B[i]&theMask]+=c;
+        pX[A[i]&theMask]+=c;
+        pY[B[i]&theMask]+=c;
+    }
+    for(aI=nrA.begin();aI!=nrA.end();aI++)
+        for(bI=nrB.begin();bI!=nrB.end();bI++)
+            if((pX[*aI]!=0.0)&&(pY[*bI]!=0.0)&&(pXY[*aI][*bI]!=0.0))
+                I+=pXY[*aI][*bI]*log2(pXY[*aI][*bI]/(pY[*bI]));
+    return -I;
 }
 double Game::computeAtomicPhi(vector<int>A,int states){
-	int i;
-	double P,EIsystem;
-	vector<int> T0,T1;
-	T0=A;
-	T1=A;
-	T0.erase(T0.begin()+T0.size()-1);
-	T1.erase(T1.begin());
-	EIsystem=ei(T0,T1,(1<<states)-1);
-	P=0.0;
-	for(i=0;i<states;i++){
-		double EIP=ei(T0,T1,1<<i);
-//		cout<<EIP<<endl;
-		P+=EIP;
-	}
-//	cout<<-EIsystem+P<<" "<<EIsystem<<" "<<P<<" "<<T0.size()<<" "<<T1.size()<<endl;
-	return -EIsystem+P;
+    int i;
+    double P,EIsystem;
+    vector<int> T0,T1;
+    T0=A;
+    T1=A;
+    T0.erase(T0.begin()+T0.size()-1);
+    T1.erase(T1.begin());
+    EIsystem=ei(T0,T1,(1<<states)-1);
+    P=0.0;
+    for(i=0;i<states;i++){
+        double EIP=ei(T0,T1,1<<i);
+//      cout<<EIP<<endl;
+        P+=EIP;
+    }
+//  cout<<-EIsystem+P<<" "<<EIsystem<<" "<<P<<" "<<T0.size()<<" "<<T1.size()<<endl;
+    return -EIsystem+P;
 }
 
 
 
 double Game::computeR(vector<vector<int> > table,int howFarBack){
-	double Iwh,Iws,Ish,Hh,Hs,Hw,Hhws,delta,R;
-	int i;
-	for(i=0;i<howFarBack;i++){
-		table[0].erase(table[0].begin());
-		table[1].erase(table[1].begin());
-		table[2].erase(table[2].begin()+(table[2].size()-1));
-	}
-	table[4].clear();
-	for(i=0;i<table[0].size();i++){
-		table[4].push_back((table[0][i]<<14)+(table[1][i]<<10)+table[2][i]);
-	}
-	Iwh=mutualInformation(table[0],table[2]);
+    double Iwh,Iws,Ish,Hh,Hs,Hw,Hhws,delta,R;
+    int i;
+    for(i=0;i<howFarBack;i++){
+        table[0].erase(table[0].begin());
+        table[1].erase(table[1].begin());
+        table[2].erase(table[2].begin()+(table[2].size()-1));
+    }
+    table[4].clear();
+    for(i=0;i<table[0].size();i++){
+        table[4].push_back((table[0][i]<<14)+(table[1][i]<<10)+table[2][i]);
+    }
+    Iwh=mutualInformation(table[0],table[2]);
     Iws=mutualInformation(table[0],table[1]);
     Ish=mutualInformation(table[1],table[2]);
     Hh=entropy(table[2]);
@@ -496,45 +521,45 @@ double Game::computeR(vector<vector<int> > table,int howFarBack){
     Hhws=entropy(table[4]);
     delta=Hhws+Iwh+Iws+Ish-Hh-Hs-Hw;
     R=Iwh-delta;
-  	return R;
+    return R;
 }
 
 double Game::computeOldR(vector<vector<int> > table){
-	double Ia,Ib;
-	Ia=mutualInformation(table[0], table[2]);
-	Ib=mutualInformation(table[1], table[2]);
-	return Ib-Ia;
+    double Ia,Ib;
+    Ia=mutualInformation(table[0], table[2]);
+    Ib=mutualInformation(table[1], table[2]);
+    return Ib-Ia;
 }
 
 double Game::predictiveI(vector<int>A){
-	vector<int> S,I;
-	S.clear(); I.clear();
-	for(int i=0;i<A.size();i++){
-		S.push_back((A[i]>>12)&15);
-		I.push_back(A[i]&3);
-	}
-	return mutualInformation(S, I);
+    vector<int> S,I;
+    S.clear(); I.clear();
+    for(int i=0;i<A.size();i++){
+        S.push_back((A[i]>>12)&15);
+        I.push_back(A[i]&3);
+    }
+    return mutualInformation(S, I);
 }
 
 double Game::nonPredictiveI(vector<int>A){
-	vector<int> S,I;
-	S.clear(); I.clear();
-	for(int i=0;i<A.size();i++){
-		S.push_back((A[i]>>12)&15);
-		I.push_back(A[i]&3);
-	}
-	return entropy(I)-mutualInformation(S, I);
+    vector<int> S,I;
+    S.clear(); I.clear();
+    for(int i=0;i<A.size();i++){
+        S.push_back((A[i]>>12)&15);
+        I.push_back(A[i]&3);
+    }
+    return entropy(I)-mutualInformation(S, I);
 }
 double Game::predictNextInput(vector<int>A){
-	vector<int> S,I;
-	S.clear(); I.clear();
-	for(int i=0;i<A.size();i++){
-		S.push_back((A[i]>>12)&15);
-		I.push_back(A[i]&3);
-	}
-	S.erase(S.begin());
-	I.erase(I.begin()+I.size()-1);
-	return mutualInformation(S, I);
+    vector<int> S,I;
+    S.clear(); I.clear();
+    for(int i=0;i<A.size();i++){
+        S.push_back((A[i]>>12)&15);
+        I.push_back(A[i]&3);
+    }
+    S.erase(S.begin());
+    I.erase(I.begin()+I.size()-1);
+    return mutualInformation(S, I);
 }
 
 
@@ -652,7 +677,7 @@ void Game::makeFullAnalysis(Agent *agent,char *fileLead,double sensorNoise){
             for(i=0;i<8;i++)
                 for(j=0;j<2;j++){
                     analyseKO(agent,i,j,sensorNoise);
-                    fprintf(f,"	%i",agent->correct);
+                    fprintf(f," %i",agent->correct);
                 }
             fprintf(f,"\n");
             fclose(f);
@@ -667,7 +692,6 @@ void Game::makeFullAnalysis(Agent *agent,char *fileLead,double sensorNoise){
 void Game::makeSingleAgentAnalysis(Agent *agent,char *fileLead, int agent_num){
     char filename[1000];
     FILE *f;
-    int i,j;
     //state to state table
     sprintf(filename,"%s_%i_%i_FullLogicTable.txt",fileLead,agent->born,agent_num);
     f=fopen(filename,"w+t");
@@ -688,27 +712,22 @@ void Game::makeSingleAgentAnalysis(Agent *agent,char *fileLead, int agent_num){
 }
 
 double Game::computeRGiven(vector<int>W,vector<int>S,vector<int>B,int nrWstates,int nrSstates,int nrBstates){
-	double Iwh,Iws,Ish,Hh,Hs,Hw,Hhws,delta,R;
-	int i;
+    double Iwh, Iws, Ish, Hh, Hs, Hw, Hhws, delta, R;
+    int i;
     vector<int> total;
-	total.clear();
-	for(i=0;i<W.size();i++){
-		total.push_back((W[i]<<(nrBstates+nrWstates))+(S[i]<<nrBstates)+B[i]);
-	}
-	Iwh=mutualInformation(W,B);
-    Iws=mutualInformation(W,S);
-    Ish=mutualInformation(S,B);
-    Hh=entropy(B);
-    Hs=entropy(S);
-    Hw=entropy(W);
-    Hhws=entropy(total);
-    delta=Hhws+Iwh+Iws+Ish-Hh-Hs-Hw;
-    R=Iwh-delta;
-  	return R;
+    total.clear();
+    for(i = 0; i < W.size(); i++) {
+        total.push_back(
+                (W[i] << (nrBstates+nrWstates)) + (S[i] << nrBstates) + B[i]);
+    }
+    Iwh = mutualInformation(W, B);
+    Iws = mutualInformation(W, S);
+    Ish = mutualInformation(S, B);
+    Hh = entropy(B);
+    Hs = entropy(S);
+    Hw = entropy(W);
+    Hhws = entropy(total);
+    delta = Hhws + Iwh + Iws + Ish - Hh - Hs - Hw;
+    R = Iwh - delta;
+    return R;
 }
-
-
-
-
-
-

@@ -3,7 +3,6 @@
  *  HMMBrain
  *
  *  Created by Arend on 9/16/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
  *
  */
 
@@ -171,7 +170,7 @@ void Agent::resetBrain(void){
 		states[i]=0;
 #ifdef useANN
 	ANN->resetBrain();
-#endif;
+#endif
 }
 
 void Agent::updateStates(void){
@@ -196,8 +195,6 @@ void Agent::showBrain(void){
 }
 
 void Agent::initialize(int x, int y, int d){
-	int i,j;
-	unsigned char dummy;
 	xPos=x;
 	yPos=y;
 	direction=d;
@@ -230,7 +227,7 @@ void Agent::saveFromLMRCAtoNULL(FILE *statsFile,FILE *genomeFile){
 	if(ancestor!=NULL)
 		ancestor->saveFromLMRCAtoNULL(statsFile,genomeFile);
 	if(!saved){
-		fprintf(statsFile,"%i	%i	%i	%f	%i	%f	%i	%i\n",ID,born,genome.size(),fitness,bestSteps,(float)totalSteps/(float)nrOfOffspring,correct,incorrect);
+		fprintf(statsFile,"%i	%i	%lu	%f	%i	%f	%i	%i\n",ID,born,genome.size(),fitness,bestSteps,(float)totalSteps/(float)nrOfOffspring,correct,incorrect);
 		fprintf(genomeFile,"%i	",ID);
 		for(int i=0;i<genome.size();i++)
 			fprintf(genomeFile,"	%i",genome[i]);

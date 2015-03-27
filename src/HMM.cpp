@@ -116,7 +116,6 @@ void HMMU::setupQuick(vector<unsigned char> &genome, int start){
 void HMMU::update(unsigned char *states,unsigned char *newStates){
 	int I=0;
 	int i,j,r;
-	unsigned char mod;
 #ifdef feedbackON
     cout<<"FeedbackON"<<endl;
 	if((nrPos!=0)&&(states[posFBNode]==1)){
@@ -167,7 +166,6 @@ void HMMU::update(unsigned char *states,unsigned char *newStates){
 void HMMU::deterministicUpdate(unsigned char *states,unsigned char *newStates){
 	int I=0;
 	int i,j;
-	unsigned char mod;
 	for(i=0;i<ins.size();i++)
 		I=(I<<1)+((states[ins[i]])&1);
 	j=0;

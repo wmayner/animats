@@ -38,7 +38,6 @@ void tLayer::update(bool useTanH){
 }
 
 void ANN::setup(void){
-	int i;
 	layers.resize(3);
 	layers[0].setup(8,6);
 	layers[1].setup(6,4);
@@ -94,7 +93,7 @@ void ANN::load(char *filename){
 }
 
 void ANN::update(unsigned char *states){
-	int i,j;
+	int i;
 	//*
 	for(i=0;i<4;i++)
 		if(states[i]==0)
