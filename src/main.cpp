@@ -106,9 +106,8 @@ int main(int argc, char *argv[]) {
         for (i = 0; i < agent.size(); i++) {
             Agent *d;
             d = new Agent;
-            // TODO(wmayner) change to while?
             do {
-                j = rand()%(int)agent.size();
+                j = rand() % (int)agent.size();
             } while (randDouble > (agent[j]->fitness / maxFitness));
             d->inherit(agent[j], perSiteMutationRate, update);
             nextGen[i] = d;
@@ -126,7 +125,6 @@ int main(int argc, char *argv[]) {
     // Larissa: put noise to 0 for analysis
     game->makeFullAnalysis(agent[0], argv[4], 0);
     saveLOD(game, agent[0], LOD, genomeFile);
-    // agent[0]->ancestor->ancestor->saveGenome(genomeFile);
     return 0;
 }
 
@@ -150,6 +148,8 @@ void saveLOD(Game *game, Agent *agent, FILE *statsFile, FILE *genomeFile) {
                 fprintf(statsFile, " %i", agent->differentialCorrects[i]);
             }
             fprintf(statsFile, "\n");
+            // TODO(wmayner) don't think we need the genome file; apparently
+            // nobody understands it anyway :'(
             agent->saveGenome(genomeFile);
         }
     }

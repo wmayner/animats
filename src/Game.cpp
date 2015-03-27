@@ -9,6 +9,7 @@
 
 #include "Game.h"
 
+// TODO(wmayner) figure out and document cruel black magic voodoo sorcery
 #define KISSRND (                                                        \
     ((((rndZ = 36969 * (rndZ & 65535) + (rndZ >> 16)) << 16) +           \
       (rndW = 18000 * (rndW & 65535) + (rndW >> 16)) )                   \
@@ -65,7 +66,7 @@ void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
     int action;
     // Make random seeds unique from one another by including index.
     rndW = agent->ID + repeat;
-    rndX = ~(agent->ID+repeat);
+    rndX = ~(agent->ID + repeat);
     rndY = (agent->ID + repeat)^0b01010101010101010101010101010101;
     rndZ = (agent->ID + repeat)^0b10101010101010101010101010101010;
 
@@ -109,7 +110,7 @@ void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
                     // AH: Sensors have no noise in them now.
                     agent->states[0] = (world >> botPos) & 1;
                     // agent->states[1] = 0;
-                    agent->states[1]=(world>>((botPos+2)&15))&1;
+                    agent->states[1] = (world >> ((botPos + 2) & 15)) & 1;
                     // Larissa: Set to 0 to evolve animats with just one sensor.
                     // if (agent->born > nowUpdate) {
                     //     agent->states[0] = 0;
@@ -153,10 +154,12 @@ void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
                             break;
                     }
 
-                    // TODO(wmayner) document what the hell these bithacks do
+                    // Move the block.
                     if (j == -1) {
+                        // Left.
                         world = ((world >> 1) & 65535) + ((world & 1) << 15);
                     } else {
+                        // Right.
                         world = ((world << 1) & 65535) + ((world >> 15) & 1);
                     }
                 }
@@ -169,6 +172,7 @@ void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
                     }
                 }
 
+                // Update fitness.
                 if ((i & 1) == 0) {
                     // TODO(wmayner) replace 1.01s with constant
                     if (hit) {
