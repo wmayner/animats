@@ -1,5 +1,5 @@
 /*
- *  tAgent.cpp
+ *  Agent.cpp
  *  HMMBrain
  *
  *  Created by Arend on 9/16/10.
@@ -7,9 +7,9 @@
  *
  */
 
-#include "tAgent.h"
+#include "Agent.h"
 
-tAgent::tAgent(){
+Agent::Agent(){
 	int i;
 	nrPointingAtMe=1;
 	ancestor=NULL;
@@ -27,11 +27,11 @@ tAgent::tAgent(){
 	retired=false;
 	food=0;
 #ifdef useANN
-	ANN=new tANN;
+	ANN=new ANN;
 #endif
 }
 
-tAgent::~tAgent(){
+Agent::~Agent(){
 	for(int i=0;i<hmmus.size();i++)
 		delete hmmus[i];
 	if(ancestor!=NULL){
@@ -44,7 +44,7 @@ tAgent::~tAgent(){
 #endif
 }
 
-void tAgent::setupRandomAgent(int nucleotides){
+void Agent::setupRandomAgent(int nucleotides){
 	int i;
 	genome.resize(nucleotides);
 	for(i=0;i<nucleotides;i++)
@@ -55,7 +55,7 @@ void tAgent::setupRandomAgent(int nucleotides){
 	ANN->setup();
 #endif
 }
-void tAgent::loadAgent(char* filename){
+void Agent::loadAgent(char* filename){
 	FILE *f=fopen(filename,"r+t");
 	int i;
 	genome.clear();
@@ -66,9 +66,9 @@ void tAgent::loadAgent(char* filename){
     fclose(f);
 	setupPhenotype();
 }
-void tAgent::loadAgentWithTrailer(char* filename){
+void Agent::loadAgentWithTrailer(char* filename){
 #ifdef useANN
-	ANN=new tANN;
+	ANN=new ANN;
 	ANN->load(filename);
 #else
 	FILE *f=fopen(filename,"r+t");
@@ -84,7 +84,7 @@ void tAgent::loadAgentWithTrailer(char* filename){
 }
 
 
-void tAgent::ampUpStartCodons(void){
+void Agent::ampUpStartCodons(void){
 	int i,j;
 	for(i=0;i<genome.size();i++)
 		genome[i]=rand()&255;
@@ -98,7 +98,7 @@ void tAgent::ampUpStartCodons(void){
 	}
 }
 
-void tAgent::inherit(tAgent *from,double mutationRate,int theTime){
+void Agent::inherit(Agent *from,double mutationRate,int theTime){
 	int nucleotides=from->genome.size();
 	int i,s,o,w;
 	vector<unsigned char> buffer;
@@ -134,23 +134,23 @@ void tAgent::inherit(tAgent *from,double mutationRate,int theTime){
 	ANN->inherit(ancestor->ANN,mutationRate);
 #endif
 }
-void tAgent::setupPhenotype(void){
+void Agent::setupPhenotype(void){
 	int i;
-	tHMMU *hmmu;
+	HMMU *hmmu;
 	if(hmmus.size()!=0)
 		for(i=0;i<hmmus.size();i++)
 			delete hmmus[i];
 	hmmus.clear();
 	for(i=0;i<genome.size();i++){
 		if((genome[i]==42)&&(genome[(i+1)%genome.size()]==(255-42))){
-			hmmu=new tHMMU;
+			hmmu=new HMMU;
 			hmmu->setupQuick(genome,i);
 			//hmmu->setup(genome,i);
 			hmmus.push_back(hmmu);
 		}
         /*
 		if((genome[i]==43)&&(genome[(i+1)%genome.size()]==(255-43))){
-			hmmu=new tHMMU;
+			hmmu=new HMMU;
 			hmmu->setup(genome,i);
 			//hmmu->setupQuick(genome,i);
 			hmmus.push_back(hmmu);
@@ -159,14 +159,14 @@ void tAgent::setupPhenotype(void){
 	}
 }
 
-void tAgent::retire(void){
+void Agent::retire(void){
 }
 
-unsigned char * tAgent::getStatesPointer(void){
+unsigned char * Agent::getStatesPointer(void){
 	return states;
 }
 
-void tAgent::resetBrain(void){
+void Agent::resetBrain(void){
 	for(int i=0;i<maxNodes;i++)
 		states[i]=0;
 #ifdef useANN
@@ -174,7 +174,7 @@ void tAgent::resetBrain(void){
 #endif;
 }
 
-void tAgent::updateStates(void){
+void Agent::updateStates(void){
 #ifdef useANN
 	ANN->update(&states[0]);
 #else
@@ -189,13 +189,13 @@ void tAgent::updateStates(void){
 	totalSteps++;
 }
 
-void tAgent::showBrain(void){
+void Agent::showBrain(void){
 	for(int i=0;i<maxNodes;i++)
 		cout<<(int)states[i];
 	cout<<endl;
 }
 
-void tAgent::initialize(int x, int y, int d){
+void Agent::initialize(int x, int y, int d){
 	int i,j;
 	unsigned char dummy;
 	xPos=x;
@@ -210,8 +210,8 @@ void tAgent::initialize(int x, int y, int d){
 	*/
 }
 
-tAgent* tAgent::findLMRCA(void){
-	tAgent *r,*d;
+Agent* Agent::findLMRCA(void){
+	Agent *r,*d;
 	if(ancestor==NULL)
 		return NULL;
 	else{
@@ -226,10 +226,10 @@ tAgent* tAgent::findLMRCA(void){
 	}
 }
 
-void tAgent::saveFromLMRCAtoNULL(FILE *statsFile,FILE *genomeFile){
+void Agent::saveFromLMRCAtoNULL(FILE *statsFile,FILE *genomeFile){
 	if(ancestor!=NULL)
 		ancestor->saveFromLMRCAtoNULL(statsFile,genomeFile);
-	if(!saved){ 
+	if(!saved){
 		fprintf(statsFile,"%i	%i	%i	%f	%i	%f	%i	%i\n",ID,born,genome.size(),fitness,bestSteps,(float)totalSteps/(float)nrOfOffspring,correct,incorrect);
 		fprintf(genomeFile,"%i	",ID);
 		for(int i=0;i<genome.size();i++)
@@ -239,14 +239,14 @@ void tAgent::saveFromLMRCAtoNULL(FILE *statsFile,FILE *genomeFile){
 	}
 	if((saved)&&(retired)) genome.clear();
 }
-void tAgent::saveLOD(FILE *statsFile,FILE *genomeFile){
+void Agent::saveLOD(FILE *statsFile,FILE *genomeFile){
 	if(ancestor!=NULL)
 		ancestor->saveLOD(statsFile,genomeFile);
 #ifdef useANN
 	fprintf(genomeFile,"%i	",ID);
 	fprintf(statsFile,"%i	%i	%i	%f	%i	%f	%i	%i\n",ID,born,(int)genome.size(),fitness,bestSteps,(float)totalSteps/(float)nrOfOffspring,correct,incorrect);
 	ANN->saveLOD(genomeFile);
-#else	
+#else
     fprintf(statsFile,"%i	%i	%f	%i	%f	%i	%i\n",ID,born,fitness,bestSteps,(float)totalSteps/(float)nrOfOffspring,correct,incorrect);
     if(!retired){
         for(int i=0;i<genome.size();i++)
@@ -254,16 +254,16 @@ void tAgent::saveLOD(FILE *statsFile,FILE *genomeFile){
         fprintf(genomeFile,"\n");
     }
 #endif
-	
+
 }
 
-void tAgent::showPhenotype(void){
+void Agent::showPhenotype(void){
 	for(int i=0;i<hmmus.size();i++)
 		hmmus[i]->show();
 	cout<<"------"<<endl;
 }
 
-void tAgent::saveToDot(char *filename){
+void Agent::saveToDot(char *filename){
 	FILE *f=fopen(filename,"w+t");
 	int i,j,k;
 	fprintf(f,"digraph brain {\n");
@@ -284,14 +284,14 @@ void tAgent::saveToDot(char *filename){
 		}
 	//	fprintf(f,"	}\n");
 	}
-	fprintf(f,"	{ rank=same; 0;  1;  2;  3;  4;  5;  6;  7; 8;}\n"); 
-	fprintf(f,"	{ rank=same; 9; 10; 11; 12; 13; 14; 15; 16; 17; }\n"); 
-	fprintf(f,"	{ rank=same; 18; 19; 20; 21; 22; 23; 24; 25; 26; 27; 28;}\n"); 
-	fprintf(f,"	{ rank=same; 29; 30; 31; }\n"); 
+	fprintf(f,"	{ rank=same; 0;  1;  2;  3;  4;  5;  6;  7; 8;}\n");
+	fprintf(f,"	{ rank=same; 9; 10; 11; 12; 13; 14; 15; 16; 17; }\n");
+	fprintf(f,"	{ rank=same; 18; 19; 20; 21; 22; 23; 24; 25; 26; 27; 28;}\n");
+	fprintf(f,"	{ rank=same; 29; 30; 31; }\n");
 	fprintf(f,"}\n");
 	fclose(f);
 }
-void tAgent::saveToDotFullLayout(char *filename){
+void Agent::saveToDotFullLayout(char *filename){
 	FILE *f=fopen(filename,"w+t");
 	int i,j,k;
 	fprintf(f,"digraph brain {\n");
@@ -302,12 +302,12 @@ void tAgent::saveToDotFullLayout(char *filename){
 			fprintf(f,"	t0_%i -> MM_%i\n",hmmus[i]->ins[j],i);
 		for(k=0;k<hmmus[i]->outs.size();k++)
 			fprintf(f,"	MM_%i -> t1_%i\n",i,hmmus[i]->outs[k]);
-		
+
 	}
 	fprintf(f,"}\n");
 }
 
-void tAgent::setupDots(int x, int y,double spacing){
+void Agent::setupDots(int x, int y,double spacing){
 	double xo,yo;
 	int i,j,k;
 	xo=(double)(x-1)*spacing;
@@ -327,7 +327,7 @@ void tAgent::setupDots(int x, int y,double spacing){
 		}
 }
 
-void tAgent::saveLogicTable(FILE *f){
+void Agent::saveLogicTable(FILE *f){
 	int i,j;
 	fprintf(f,"0_t0,1_t0,2_t0,3_t0,4_t0,5_t0,6_t0,7_t0,,0_t1,1_t1,2_t1,3_t1,4_t1,5_t1,6_t1,7_t1\n");
 	for(i=0;i<256;i++){
@@ -343,14 +343,14 @@ void tAgent::saveLogicTable(FILE *f){
 	}
 }
 
-void tAgent::saveLogicTableSingleAnimat(FILE *f){
+void Agent::saveLogicTableSingleAnimat(FILE *f){
 	int i,j,k;
 	fprintf(f,"0_t0,1_t0,2_t0,3_t0,4_t0,5_t0,6_t0,7_t0,,0_t1,1_t1,2_t1,3_t1,4_t1,5_t1,6_t1,7_t1\n");
 	for(i=0;i<256;i++){
 		for(j=0;j<8;j++){
 			fprintf(f,"%i,",(i>>j)&1);
 			states[j]=(i>>j)&1;
-		}  
+		}
         // update States deterministically, without using random number generator
         for(k=0;k<hmmus.size();k++)
             hmmus[k]->deterministicUpdate(&states[0],&newStates[0]);
@@ -365,14 +365,14 @@ void tAgent::saveLogicTableSingleAnimat(FILE *f){
 	}
 }
 
-void tAgent::saveGenome(FILE *f){
+void Agent::saveGenome(FILE *f){
 	int i;
 	for(i=0;i<genome.size();i++)
 		fprintf(f,"%i	",genome[i]);
 	fprintf(f,"\n");
 }
 
-void tAgent::saveEdgeList(char *filename){
+void Agent::saveEdgeList(char *filename){
 	FILE *f=fopen(filename,"w+t");
 	int i,j,k;
 	for(i=0;i<hmmus.size();i++){

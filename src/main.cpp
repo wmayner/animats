@@ -11,9 +11,9 @@
 #include <iostream>
 
 #include "globalConst.h"
-#include "tHMM.h"
-#include "tAgent.h"
-#include "tGame.h"
+#include "HMM.h"
+#include "Agent.h"
+#include "Game.h"
 
 #define randDouble ((double)rand() / (double)RAND_MAX)
 
@@ -27,14 +27,14 @@ int totalGenerations = 4000;
 char trialName[1000];
 double sensorNoise = 0.0;
 
-void saveLOD(tGame *game, tAgent *agent, FILE *statsFile, FILE *genomeFile);
+void saveLOD(Game *game, Agent *agent, FILE *statsFile, FILE *genomeFile);
 
 int main(int argc, char *argv[]) {
-    vector<tAgent*> agent;
-    vector<tAgent*> nextGen;
-    tAgent *masterAgent;
+    vector<Agent*> agent;
+    vector<Agent*> nextGen;
+    Agent *masterAgent;
     int i, j, who = 0;
-    tGame *game;
+    Game *game;
     double maxFitness;
     FILE *resFile;
     FILE *LOD;
@@ -48,17 +48,17 @@ int main(int argc, char *argv[]) {
         srand(getpid());
     }
     agent.resize(maxAgent);
-    game = new tGame(argv[1]);
+    game = new Game(argv[1]);
 
     // Larissa
     game->nowUpdate = floor(totalGenerations / 2);
 
     sensorNoise = atof(argv[6]);
-    masterAgent = new tAgent;
+    masterAgent = new Agent;
     masterAgent->setupRandomAgent(5000);
     masterAgent->setupPhenotype();
     for (i = 0; i < agent.size(); i++) {
-        agent[i] = new tAgent;
+        agent[i] = new Agent;
         agent[i]->inherit(masterAgent, 0.01, 0);
     }
     nextGen.resize(agent.size());
@@ -105,8 +105,8 @@ int main(int argc, char *argv[]) {
             " " << (float)agent[who]->correct / (83.0 * 82.0) << endl;
 
         for (i = 0; i < agent.size(); i++) {
-            tAgent *d;
-            d = new tAgent;
+            Agent *d;
+            d = new Agent;
             // TODO(wmayner) change to while?
             do {
                 j = rand()%(int)agent.size();
@@ -131,9 +131,9 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-void saveLOD(tGame *game, tAgent *agent, FILE *statsFile, FILE *genomeFile) {
-    vector<tAgent*> list;
-    tAgent *localAgent = agent;
+void saveLOD(Game *game, Agent *agent, FILE *statsFile, FILE *genomeFile) {
+    vector<Agent*> list;
+    Agent *localAgent = agent;
     while (localAgent != NULL) {
         list.push_back(localAgent);
         localAgent = localAgent->ancestor;

@@ -1,5 +1,5 @@
 /*
- *  tAgent.h
+ *  Agent.h
  *  HMMBrain
  *
  *  Created by Arend on 9/16/10.
@@ -7,13 +7,13 @@
  *
  */
 
-#ifndef _tAgent_h_included_
-#define _tAgent_h_included_
+#ifndef _Agent_h_included_
+#define _Agent_h_included_
 
 #include "globalConst.h"
-#include "tHMM.h"
+#include "HMM.h"
 #include <vector>
-#include "tANN.h"
+#include "ANN.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -31,22 +31,22 @@ public:
 };
 
 
-class tAgent{
+class Agent{
 public:
-	vector<tHMMU*> hmmus;
+	vector<HMMU*> hmmus;
 	vector<unsigned char> genome;
 	vector<tDot> dots;
 #ifdef useANN
-	tANN *ANN;
+	ANN *ANN;
 #endif
-	
-	tAgent *ancestor;
+
+	Agent *ancestor;
 	unsigned int nrPointingAtMe;
 	unsigned char states[maxNodes],newStates[maxNodes];
 	double fitness,convFitness;
 	vector<double> fitnesses;
 	int food;
-	
+
 	double xPos,yPos,direction;
 	double sX,sY;
 	bool foodAlreadyFound;
@@ -57,14 +57,14 @@ public:
 	int born;
 	int correct,incorrect;
     vector<int> differentialCorrects;
-	
-	tAgent();
-	~tAgent();
+
+	Agent();
+	~Agent();
 	void setupRandomAgent(int nucleotides);
 	void loadAgent(char* filename);
 	void loadAgentWithTrailer(char* filename);
 	void setupPhenotype(void);
-	void inherit(tAgent *from,double mutationRate,int theTime);
+	void inherit(Agent *from,double mutationRate,int theTime);
 	unsigned char * getStatesPointer(void);
 	void updateStates(void);
 	void resetBrain(void);
@@ -73,9 +73,9 @@ public:
 	void showPhenotype(void);
 	void saveToDot(char *filename);
 	void saveToDotFullLayout(char *filename);
-	
+
 	void initialize(int x, int y, int d);
-	tAgent* findLMRCA(void);
+	Agent* findLMRCA(void);
 	void saveFromLMRCAtoNULL(FILE *statsFile,FILE *genomeFile);
 	void saveLOD(FILE *statsFile,FILE *genomeFile);
 	void retire(void);

@@ -1,5 +1,5 @@
 /*
- *  tANN.h
+ *  ANN.h
  *  HMM_representations
  *
  *  Created by Arend on 12/20/10.
@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _tANN_h_included_
-#define _tANN_h_included_
+#ifndef _ANN_h_included_
+#define _ANN_h_included_
 
 #include <vector>
 #include <deque>
@@ -26,11 +26,11 @@ public:
 	void update(bool useTanH);
 };
 
-class tANN{
+class ANN{
 public:
 	vector<tLayer> layers;
 	void setup(void);
-	void inherit(tANN *ancestor,double mutationRate);
+	void inherit(ANN *ancestor,double mutationRate);
 	void saveLOD(FILE *genomeFile);
 	void load(char *filename);
 	void update(unsigned char *states);

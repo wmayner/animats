@@ -1,5 +1,5 @@
 /*
- *  tHMM.h
+ *  HMM.h
  *  HMMBrain
  *
  *  Created by Arend on 9/16/10.
@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef _tHMM_h_included_
-#define _tHMM_h_included_
+#ifndef _HMM_h_included_
+#define _HMM_h_included_
 
 #include <vector>
 #include <deque>
@@ -19,7 +19,7 @@
 
 using namespace std;
 
-class tHMMU{
+class HMMU{
 public:
 	vector<vector<unsigned char> > hmm;
 	vector<unsigned int> sums;
@@ -28,16 +28,16 @@ public:
 	unsigned char nrPos,nrNeg;
 	vector<int> posLevelOfFB,negLevelOfFB;
 	deque<unsigned char> chosenInPos,chosenInNeg,chosenOutPos,chosenOutNeg;
-	
+
 	unsigned char _xDim,_yDim;
-	tHMMU();
-	~tHMMU();
+	HMMU();
+	~HMMU();
 	void setup(vector<unsigned char> &genome, int start);
 	void setupQuick(vector<unsigned char> &genome, int start);
 	void update(unsigned char *states,unsigned char *newStates);
     void deterministicUpdate(unsigned char *states,unsigned char *newStates);
 	void show(void);
-	
+
 };
 
 #endif

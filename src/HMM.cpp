@@ -1,5 +1,5 @@
 /*
- *  tHMM.cpp
+ *  HMM.cpp
  *  HMMBrain
  *
  *  Created by Arend on 9/16/10.
@@ -7,14 +7,14 @@
  *
  */
 
-#include "tHMM.h"
+#include "HMM.h"
 #include <iostream>
 //#define feedbackON
 
-tHMMU::tHMMU(){
+HMMU::HMMU(){
 }
 
-tHMMU::~tHMMU(){
+HMMU::~HMMU(){
 	hmm.clear();
 	sums.clear();
 	ins.clear();
@@ -26,7 +26,7 @@ tHMMU::~tHMMU(){
 	chosenOutPos.clear();
 	chosenOutNeg.clear();
 }
-void tHMMU::setup(vector<unsigned char> &genome, int start){
+void HMMU::setup(vector<unsigned char> &genome, int start){
 	int i,j,k;
 	ins.clear();
 	outs.clear();
@@ -55,7 +55,7 @@ void tHMMU::setup(vector<unsigned char> &genome, int start){
 	chosenInNeg.clear();
 	chosenOutPos.clear();
 	chosenOutNeg.clear();
-	
+
 	k=k+16;
 	hmm.resize(1<<_yDim);
 	sums.resize(1<<_yDim);
@@ -70,12 +70,12 @@ void tHMMU::setup(vector<unsigned char> &genome, int start){
 	}
 }
 
-void tHMMU::setupQuick(vector<unsigned char> &genome, int start){
+void HMMU::setupQuick(vector<unsigned char> &genome, int start){
 	int i,j,k;
 	ins.clear();
 	outs.clear();
 	k=(start+2)%genome.size(); //Larissa: The % (mod) is to make the genome circular
-	
+
 	_xDim=1+(genome[(k++)%genome.size()]&3);
 	_yDim=1+(genome[(k++)%genome.size()]&3);
 	posFBNode=genome[(k++)%genome.size()]&(maxNodes-1);
@@ -99,7 +99,7 @@ void tHMMU::setupQuick(vector<unsigned char> &genome, int start){
 	chosenInNeg.clear();
 	chosenOutPos.clear();
 	chosenOutNeg.clear();
-	
+
 	k=k+16;
 	hmm.resize(1<<_yDim);
 	sums.resize(1<<_yDim);
@@ -110,10 +110,10 @@ void tHMMU::setupQuick(vector<unsigned char> &genome, int start){
 		hmm[i][genome[(k+j+((1<<_xDim)*i))%genome.size()]&((1<<_xDim)-1)]=255;
 		sums[i]=255;
 	}
-	
+
 }
 
-void tHMMU::update(unsigned char *states,unsigned char *newStates){
+void HMMU::update(unsigned char *states,unsigned char *newStates){
 	int I=0;
 	int i,j,r;
 	unsigned char mod;
@@ -164,7 +164,7 @@ void tHMMU::update(unsigned char *states,unsigned char *newStates){
 #endif
 }
 
-void tHMMU::deterministicUpdate(unsigned char *states,unsigned char *newStates){
+void HMMU::deterministicUpdate(unsigned char *states,unsigned char *newStates){
 	int I=0;
 	int i,j;
 	unsigned char mod;
@@ -180,7 +180,7 @@ void tHMMU::deterministicUpdate(unsigned char *states,unsigned char *newStates){
     //newStates[outs[i]]=(j>>i)&1;
 }
 
-void tHMMU::show(void){
+void HMMU::show(void){
 	int i,j;
 	cout<<"INS: ";
 	for(i=0;i<ins.size();i++)

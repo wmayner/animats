@@ -1,5 +1,5 @@
 /*
- *  tGame.cpp
+ *  Game.cpp
  *  HMMBrain
  *
  *  Created by Arend on 9/23/10.
@@ -7,7 +7,7 @@
  *
  */
 
-#include "tGame.h"
+#include "Game.h"
 #include <math.h>
 
 #define KISSRND (((((rndZ=36969*(rndZ&65535)+(rndZ>>16))<<16)+(rndW=18000*(rndW&65535)+(rndW>>16)) )^(rndY=69069*rndY+1234567))+(rndX^=(rndX<<17), rndX^=(rndX>>13), rndX^=(rndX<<5)))
@@ -18,7 +18,7 @@
 int rndX,rndY,rndZ,rndW;
 
 
-tGame::tGame(char* filename){
+Game::Game(char* filename){
     FILE *f=fopen(filename,"r+w");
     int i,j;
     patterns.clear();
@@ -29,20 +29,20 @@ tGame::tGame(char* filename){
     fclose(f);
 }
 
-tGame::~tGame(){
+Game::~Game(){
 }
 
-double tGame::agentDependentRandDouble(void){
+double Game::agentDependentRandDouble(void){
     int A=KISSRND;
     return (double)((INTABS(A))&65535)/(double)65535;
 }
-int tGame::agentDependentRandInt(void){
+int Game::agentDependentRandInt(void){
     int A=KISSRND;
     return (INTABS(A));
 }
 
 
-void tGame::applyNoise(tAgent *agent,double sensorNoise){
+void Game::applyNoise(Agent *agent,double sensorNoise){
     //if(agentDependentRandDouble()<sensorNoise){
     if(randDouble<sensorNoise)  //Larissa: If I don't have noise in evaluation, then I can just use random numbers always
           agent->states[0]=!agent->states[0];
@@ -51,7 +51,7 @@ void tGame::applyNoise(tAgent *agent,double sensorNoise){
         agent->states[1]=!agent->states[1];
 }
 
-void tGame::executeGame(tAgent* agent,FILE *f,double sensorNoise, int repeat){
+void Game::executeGame(Agent* agent,FILE *f,double sensorNoise, int repeat){
     int world,botPos,blockPos;
     int i,j,k,l,m;
     unsigned char W;
@@ -71,8 +71,8 @@ void tGame::executeGame(tAgent* agent,FILE *f,double sensorNoise, int repeat){
     for(i=0;i<patterns.size();i++){
         for(j=-1;j<2;j+=2){
             for(k=0;k<16;k++){
-                //Larissa: Change environment after 30,000 Gen, if patterns is 1 7 15 3 it changes 
-                //from 2 blocks with 1 7 to 4 blocks with 1 7 15 3 
+                //Larissa: Change environment after 30,000 Gen, if patterns is 1 7 15 3 it changes
+                //from 2 blocks with 1 7 to 4 blocks with 1 7 15 3
                 //if (agent->born > nowUpdate || i<2){
 //                if (agent->born > nowUpdate){
                     world=patterns[i];
@@ -82,7 +82,7 @@ void tGame::executeGame(tAgent* agent,FILE *f,double sensorNoise, int repeat){
 //                    if (i == 0 || i == 2) world=7;
 //                    else if (i==1 || i == 3) world=15;
 //                    //cout<<world<<endl;
-//                }    
+//                }
                 agent->resetBrain();
                 botPos=k;
                 blockPos=0;
@@ -93,7 +93,7 @@ void tGame::executeGame(tAgent* agent,FILE *f,double sensorNoise, int repeat){
 //                    printf("\n");
                     //AH: Sensors have no noise in them now
                     agent->states[0]=(world>>botPos)&1;
-//                    agent->states[1]=0;                      
+//                    agent->states[1]=0;
                     agent->states[1]=(world>>((botPos+2)&15))&1;
                     //Larissa: Set to 0 to evolve animats with just one sensor
 //                    if (agent->born > nowUpdate){
@@ -114,7 +114,7 @@ void tGame::executeGame(tAgent* agent,FILE *f,double sensorNoise, int repeat){
                    // action=0; //Larissa: this makes the animat stop moving
                     switch(action){
                         case 0:
-                        case 3:// nothing! 
+                        case 3:// nothing!
                             break;
                         case 1:
                             botPos=(botPos+1)&15;
@@ -155,10 +155,10 @@ void tGame::executeGame(tAgent* agent,FILE *f,double sensorNoise, int repeat){
                 }
             }
         }
-            
+
     }
 }
-vector<vector<int> > tGame::executeGameLogStates(tAgent* agent,double sensorNoise){
+vector<vector<int> > Game::executeGameLogStates(Agent* agent,double sensorNoise){
     int world,botPos,blockPos;
     int i,j,k,l,m,T0,T1,u;
     unsigned char W;
@@ -186,7 +186,7 @@ vector<vector<int> > tGame::executeGameLogStates(tAgent* agent,double sensorNois
 //                    if (i == 0 || i == 2) world=7;
 //                    else if (i==1 || i == 3) world=15;
 //                    //cout<<world<<endl;
-//                }    
+//                }
                 agent->resetBrain();
                 botPos=k;
                 blockPos=0;
@@ -195,11 +195,11 @@ vector<vector<int> > tGame::executeGameLogStates(tAgent* agent,double sensorNois
                     //                    for(m=0;m<16;m++)
                     //                        printf("%i",(world>>m)&1);
                     //                    printf("\n");
-                    
+
                     //AH: Sensors have no noise in them now
                     agent->states[0]=(world>>botPos)&1;
                     agent->states[1]=(world>>((botPos+2)&15))&1;
-//                    agent->states[1]=0;                      
+//                    agent->states[1]=0;
 
 //                    //Larissa: Set to 0 to evolve animats with just one sensor
 //                    if (agent->born > nowUpdate){
@@ -207,7 +207,7 @@ vector<vector<int> > tGame::executeGameLogStates(tAgent* agent,double sensorNois
 //                          agent->states[1]=(world>>((botPos+2)&15))&1;
 //                    }
                     //AH: apply noise does apply noise to them now
-                    applyNoise(agent, sensorNoise);  
+                    applyNoise(agent, sensorNoise);
                     // set motors to 0 to preven reading from them
                     agent->states[6]=0; agent->states[7]=0;
                     T0=0;
@@ -235,7 +235,7 @@ vector<vector<int> > tGame::executeGameLogStates(tAgent* agent,double sensorNois
                     action=agent->states[6]+(agent->states[7]<<1);
                     switch(action){
                         case 0:
-                        case 3:// nothing! 
+                        case 3:// nothing!
                             break;
                         case 1:
                             botPos=(botPos+1)&15;
@@ -274,12 +274,12 @@ vector<vector<int> > tGame::executeGameLogStates(tAgent* agent,double sensorNois
                 }
             }
         }
-        
+
     }
     return retValue;
 }
 
-void tGame::analyseKO(tAgent* agent,int which, int setTo,double sensorNoise){
+void Game::analyseKO(Agent* agent,int which, int setTo,double sensorNoise){
     int world,botPos,blockPos;
     int i,j,k,l,m;
     unsigned char W;
@@ -297,14 +297,14 @@ void tGame::analyseKO(tAgent* agent,int which, int setTo,double sensorNoise){
                 //Larissa: Change environment after 30,000 Gen
                 //if (agent->born > nowUpdate || i<2){
 //                if (agent->born > nowUpdate){
-                    world=patterns[i];                  
+                    world=patterns[i];
 //                    //cout<<world<<endl;
 //                } else{
 //                    //world=patterns[i-2];
 //                    if (i == 0 || i == 2) world=7;
 //                    else if (i==1 || i == 3) world=15;
 //                    //cout<<world<<endl;
-//                }    
+//                }
                 agent->resetBrain();
                 botPos=k;
                 blockPos=0;
@@ -317,7 +317,7 @@ void tGame::analyseKO(tAgent* agent,int which, int setTo,double sensorNoise){
                     agent->states[0]=(world>>botPos)&1;
                     agent->states[1]=(world>>((botPos+2)&15))&1;
 //                    //Larissa: Set to 0 to evolve animats with just one sensor
-//                    agent->states[1]=0;                
+//                    agent->states[1]=0;
 //                    if (agent->born > nowUpdate){
 //                        agent->states[0]=0;
 //                        agent->states[1]=(world>>((botPos+2)&15))&1;
@@ -336,7 +336,7 @@ void tGame::analyseKO(tAgent* agent,int which, int setTo,double sensorNoise){
                     action=agent->states[6]+(agent->states[7]<<1);
                     switch(action){
                         case 0:
-                        case 3:// nothing! 
+                        case 3:// nothing!
                             break;
                         case 1:
                             botPos=(botPos+1)&15;
@@ -375,12 +375,12 @@ void tGame::analyseKO(tAgent* agent,int which, int setTo,double sensorNoise){
                 }
             }
         }
-        
+
     }
 }
 
 
-double tGame::mutualInformation(vector<int> A,vector<int>B){
+double Game::mutualInformation(vector<int> A,vector<int>B){
 	set<int> nrA,nrB;
 	set<int>::iterator aI,bI;
 	map<int,map<int,double> > pXY;
@@ -408,10 +408,10 @@ double tGame::mutualInformation(vector<int> A,vector<int>B){
 			if((pX[*aI]!=0.0)&&(pY[*bI]!=0.0)&&(pXY[*aI][*bI]!=0.0))
 				I+=pXY[*aI][*bI]*log2(pXY[*aI][*bI]/(pX[*aI]*pY[*bI]));
 	return I;
-	
+
 }
 
-double tGame::entropy(vector<int> list){
+double Game::entropy(vector<int> list){
 	map<int, double> p;
 	map<int,double>::iterator pI;
 	int i;
@@ -420,12 +420,12 @@ double tGame::entropy(vector<int> list){
 	for(i=0;i<list.size();i++)
 		p[list[i]]+=c;
 	for (pI=p.begin();pI!=p.end();pI++) {
-			H+=p[pI->first]*log2(p[pI->first]);	
+			H+=p[pI->first]*log2(p[pI->first]);
 	}
 	return -1.0*H;
 }
 
-double tGame::ei(vector<int> A,vector<int> B,int theMask){
+double Game::ei(vector<int> A,vector<int> B,int theMask){
 	set<int> nrA,nrB;
 	set<int>::iterator aI,bI;
 	map<int,map<int,double> > pXY;
@@ -454,7 +454,7 @@ double tGame::ei(vector<int> A,vector<int> B,int theMask){
 				I+=pXY[*aI][*bI]*log2(pXY[*aI][*bI]/(pY[*bI]));
 	return -I;
 }
-double tGame::computeAtomicPhi(vector<int>A,int states){
+double Game::computeAtomicPhi(vector<int>A,int states){
 	int i;
 	double P,EIsystem;
 	vector<int> T0,T1;
@@ -475,7 +475,7 @@ double tGame::computeAtomicPhi(vector<int>A,int states){
 
 
 
-double tGame::computeR(vector<vector<int> > table,int howFarBack){
+double Game::computeR(vector<vector<int> > table,int howFarBack){
 	double Iwh,Iws,Ish,Hh,Hs,Hw,Hhws,delta,R;
 	int i;
 	for(i=0;i<howFarBack;i++){
@@ -499,14 +499,14 @@ double tGame::computeR(vector<vector<int> > table,int howFarBack){
   	return R;
 }
 
-double tGame::computeOldR(vector<vector<int> > table){
+double Game::computeOldR(vector<vector<int> > table){
 	double Ia,Ib;
 	Ia=mutualInformation(table[0], table[2]);
 	Ib=mutualInformation(table[1], table[2]);
 	return Ib-Ia;
 }
 
-double tGame::predictiveI(vector<int>A){
+double Game::predictiveI(vector<int>A){
 	vector<int> S,I;
 	S.clear(); I.clear();
 	for(int i=0;i<A.size();i++){
@@ -516,7 +516,7 @@ double tGame::predictiveI(vector<int>A){
 	return mutualInformation(S, I);
 }
 
-double tGame::nonPredictiveI(vector<int>A){
+double Game::nonPredictiveI(vector<int>A){
 	vector<int> S,I;
 	S.clear(); I.clear();
 	for(int i=0;i<A.size();i++){
@@ -525,7 +525,7 @@ double tGame::nonPredictiveI(vector<int>A){
 	}
 	return entropy(I)-mutualInformation(S, I);
 }
-double tGame::predictNextInput(vector<int>A){
+double Game::predictNextInput(vector<int>A){
 	vector<int> S,I;
 	S.clear(); I.clear();
 	for(int i=0;i<A.size();i++){
@@ -538,7 +538,7 @@ double tGame::predictNextInput(vector<int>A){
 }
 
 
-void tGame::represenationPerNodeSummary(tAgent* agent,char* filename,double sensorNoise){
+void Game::represenationPerNodeSummary(Agent* agent,char* filename,double sensorNoise){
     vector<vector<int> > table=executeGameLogStates(agent,sensorNoise);
     int W,B;
     int i,j;
@@ -609,7 +609,7 @@ void tGame::represenationPerNodeSummary(tAgent* agent,char* filename,double sens
     fclose(F);
 }
 
-void tGame::makeFullAnalysis(tAgent *agent,char *fileLead,double sensorNoise){
+void Game::makeFullAnalysis(Agent *agent,char *fileLead,double sensorNoise){
     char filename[1000];
     FILE *f;
     int i,j;
@@ -664,7 +664,7 @@ void tGame::makeFullAnalysis(tAgent *agent,char *fileLead,double sensorNoise){
     }
 }
 
-void tGame::makeSingleAgentAnalysis(tAgent *agent,char *fileLead, int agent_num){
+void Game::makeSingleAgentAnalysis(Agent *agent,char *fileLead, int agent_num){
     char filename[1000];
     FILE *f;
     int i,j;
@@ -687,7 +687,7 @@ void tGame::makeSingleAgentAnalysis(tAgent *agent,char *fileLead, int agent_num)
     agent->saveEdgeList(filename);
 }
 
-double tGame::computeRGiven(vector<int>W,vector<int>S,vector<int>B,int nrWstates,int nrSstates,int nrBstates){
+double Game::computeRGiven(vector<int>W,vector<int>S,vector<int>B,int nrWstates,int nrSstates,int nrBstates){
 	double Iwh,Iws,Ish,Hh,Hs,Hw,Hhws,delta,R;
 	int i;
     vector<int> total;

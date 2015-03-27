@@ -1,5 +1,5 @@
 /*
- *  tANN.cpp
+ *  ANN.cpp
  *  HMM_representations
  *
  *  Created by Arend on 12/20/10.
@@ -7,7 +7,7 @@
  *
  */
 
-#include "tANN.h"
+#include "ANN.h"
 #include <math.h>
 
 void tLayer::setup(int n_in,int n_out){
@@ -37,7 +37,7 @@ void tLayer::update(bool useTanH){
 			outStates[i]=tanh(outStates[i]);
 }
 
-void tANN::setup(void){
+void ANN::setup(void){
 	int i;
 	layers.resize(3);
 	layers[0].setup(8,6);
@@ -47,7 +47,7 @@ void tANN::setup(void){
 }
 
 
-void tANN::inherit(tANN *ancestor,double mutationRate){
+void ANN::inherit(ANN *ancestor,double mutationRate){
 	int i,j,k;
 	layers.resize(ancestor->layers.size());
 	for(k=0;k<layers.size();k++){
@@ -65,7 +65,7 @@ void tANN::inherit(tANN *ancestor,double mutationRate){
 	}
 }
 
-void tANN::saveLOD(FILE *genomeFile){
+void ANN::saveLOD(FILE *genomeFile){
 	int k,i,j;
 	for(k=0;k<layers.size();k++){
 		for(i=0;i<layers[k].weights.size();i++){
@@ -75,7 +75,7 @@ void tANN::saveLOD(FILE *genomeFile){
 	}
 	fprintf(genomeFile,"\n");
 }
-void tANN::load(char *filename){
+void ANN::load(char *filename){
 	int k,i,j;
 	float l;
 	FILE *f;
@@ -93,7 +93,7 @@ void tANN::load(char *filename){
 	fclose(f);
 }
 
-void tANN::update(unsigned char *states){
+void ANN::update(unsigned char *states){
 	int i,j;
 	//*
 	for(i=0;i<4;i++)
@@ -117,12 +117,12 @@ void tANN::update(unsigned char *states){
 	for(i=0;i<4;i++)
 		if(layers[1].outStates[i]>0.0)
 			states[4+i]=1;
-		else 
+		else
 			states[4+i]=0;
 	for(i=0;i<2;i++)
 		if(layers[2].outStates[i]>0.0)
 			states[14+i]=1;
-		else 
+		else
 			states[14+i]=0;
 	 //*/
 	/*
@@ -149,16 +149,16 @@ void tANN::update(unsigned char *states){
 	for(i=0;i<4;i++)
 		if(layers[1].outStates[i]>0.0)
 			states[4+i]=1;
-		else 
+		else
 			states[4+i]=0;
 	for(i=0;i<3;i++)
 		if(layers[2].outStates[i]>0.0)
 			states[13+i]=1;
-		else 
+		else
 			states[13+i]=0;
 	 */
 }
-void tANN::resetBrain(void){
+void ANN::resetBrain(void){
 	int i,j;
 	for(i=0;i<layers.size();i++){
 		for(j=0;j<layers[i].inStates.size();j++) layers[i].inStates[j]=0.0;
