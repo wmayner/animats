@@ -14,7 +14,7 @@ all:
 clean:
 	$(RM) $(BUILD)
 
-run: compile
+run: all
 	# Run the program with 5 arguments:
 	# 1. File describing the task for the animats to do
 	# 2. Output file for the line of descent
