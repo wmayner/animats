@@ -19,9 +19,6 @@
 
 using namespace std;
 
-#define startMazes 1
-#define cPI 3.14159265
-
 class Game {
  public:
     vector<int> patterns;
