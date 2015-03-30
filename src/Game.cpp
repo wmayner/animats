@@ -182,22 +182,21 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int re
 
                 // Update fitness.
                 if ((patternIndex & 1) == 0) {
-                    // TODO(wmayner) replace 1.01s with constant
                     if (hit) {
                         agent->correct++;
-                        agent->fitness *= 1.01;
+                        agent->fitness *= fitnessMultiplier;
                         agent->numCorrectByPattern[patternIndex]++;
                     } else {
-                        agent->fitness /= 1.01;
+                        agent->fitness /= fitnessMultiplier;
                         agent->incorrect++;
                     }
                 } else {
                     if (hit) {
                         agent->incorrect++;
-                        agent->fitness /= 1.01;
+                        agent->fitness /= fitnessMultiplier;
                     } else {
                         agent->correct++;
-                        agent->fitness *= 1.01;
+                        agent->fitness *= fitnessMultiplier;
                         agent->numCorrectByPattern[patternIndex]++;
                     }
                 }

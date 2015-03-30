@@ -5,6 +5,7 @@
 
 #define numNodes 8
 #define numWorldTimesteps 36
+#define fitnessMultiplier 1.01
 #define LOD_record_interval 7
 
 #endif  // _SRC_CONSTANTS_H_
