@@ -220,105 +220,6 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int re
     return stateTransitions;
 }  // executeGame
 
-void Game::analyseKO(Agent* agent,int which, int setTo,double sensorNoise){
-    int world,botPos,blockPos;
-    int i,j,k,l,m;
-    int action;
-    agent->fitness=1.0;
-    agent->correct=agent->incorrect=0;
-    rndW=agent->ID; // make random seeds unique from one another by including index
-    rndX=~agent->ID;
-    rndY=agent->ID^0b01010101010101010101010101010101;
-    rndZ=agent->ID^0b10101010101010101010101010101010;
-    bool hit;
-    for(i=0;i<patterns.size();i++){
-        for(j=-1;j<2;j+=2){
-            for(k=0;k<16;k++){
-                //Larissa: Change environment after 30,000 Gen
-                //if (agent->born > nowUpdate || i<2){
-//                if (agent->born > nowUpdate){
-                    world=patterns[i];
-//                    //cout<<world<<endl;
-//                } else{
-//                    //world=patterns[i-2];
-//                    if (i == 0 || i == 2) world=7;
-//                    else if (i==1 || i == 3) world=15;
-//                    //cout<<world<<endl;
-//                }
-                agent->resetBrain();
-                botPos=k;
-                blockPos=0;
-                //loop the world
-                for(l=0;l<loopTicks;l++){
-                    //                    for(m=0;m<16;m++)
-                    //                        printf("%i",(world>>m)&1);
-                    //                    printf("\n");
-                    //AH: Sensors have no noise in them now
-                    agent->states[0]=(world>>botPos)&1;
-                    agent->states[1]=(world>>((botPos+2)&15))&1;
-//                    //Larissa: Set to 0 to evolve animats with just one sensor
-//                    agent->states[1]=0;
-//                    if (agent->born > nowUpdate){
-//                        agent->states[0]=0;
-//                        agent->states[1]=(world>>((botPos+2)&15))&1;
-//                    }
-                    //AH: apply noise does apply noise to them now
-                    applyNoise(agent, sensorNoise);
-                    // set motors to 0 to preven reading from them
-                    agent->states[6]=0; agent->states[7]=0;
-                    agent->states[which]=setTo;
-                    agent->updateStates();
-                    //Larissa: limit to one Motor
-                    //agent->states[7]=0;
-//                    if (agent->born < nowUpdate){
-//                        agent->states[7]=0;
-//                    }
-                    action=agent->states[6]+(agent->states[7]<<1);
-                    switch(action){
-                        case 0:
-                        case 3:// nothing!
-                            break;
-                        case 1:
-                            botPos=(botPos+1)&15;
-                            break;
-                        case 2:
-                            botPos=(botPos-1)&15;
-                            break;
-                    }
-                    if(j==-1){
-                        world=((world>>1)&65535)+((world&1)<<15);
-                    } else {
-                        world=((world<<1)&65535)+((world>>15)&1);
-                    }
-                }
-                //check for hit
-                hit=false;
-                for(m=0;m<3;m++)
-                    if(((world>>((botPos+m)&15))&1)==1)
-                        hit=true;
-                if((i&1)==0){
-                    if(hit){
-                        agent->correct++;
-                        agent->fitness*=1.01;
-                    } else {
-                        agent->fitness/=1.01;
-                        agent->incorrect++;
-                    }
-                } else {
-                    if(hit){
-                        agent->incorrect++;
-                        agent->fitness/=1.01;
-                    } else {
-                        agent->correct++;
-                        agent->fitness*=1.01;
-                    }
-                }
-            }
-        }
-
-    }
-}
-
 double Game::mutualInformation(vector<int> A,vector<int>B){
     set<int> nrA,nrB;
     set<int>::iterator aI,bI;
@@ -499,7 +400,6 @@ void Game::makeFullAnalysis(Agent *agent,char *fileLead,double sensorNoise){
                 fprintf(f,"T1_%i,",i);
             fprintf(f,"\n");
             for(j=0;j<table[0].size();j++){
-                //printf("%i  %i\n",table[0][j],table[1][j]);
                 for(i=0;i<8;i++)
                     fprintf(f,"%i,",(table[0][j]>>i)&1);
                 fprintf(f,",");
@@ -507,18 +407,6 @@ void Game::makeFullAnalysis(Agent *agent,char *fileLead,double sensorNoise){
                     fprintf(f,"%i,",(table[1][j]>>i)&1);
                 fprintf(f,"\n");
             }
-            fclose(f);
-            //ko table
-            sprintf(filename,"%s_%i_KOdata.txt",fileLead,agent->born);
-            f=fopen(filename,"w+t");
-            executeGame(agent, sensorNoise);
-            fprintf(f,"%i",agent->correct);
-            for(i=0;i<8;i++)
-                for(j=0;j<2;j++){
-                    analyseKO(agent,i,j,sensorNoise);
-                    fprintf(f," %i",agent->correct);
-                }
-            fprintf(f,"\n");
             fclose(f);
             //dot file
             sprintf(filename,"%s_%i_EdgeList.txt",fileLead,agent->born);

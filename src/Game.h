@@ -43,8 +43,6 @@ class Game {
     double computeOldR(vector< vector<int> > table);
     double entropy(vector<int> list);
 
-    void analyseKO(Agent* agent, int which, int setTo, double sensorNoise);
-
     void represenationPerNodeSummary(Agent* agent, char* filename, double
             sensorNoise);
     void makeFullAnalysis(Agent *agent, char *fileLead, double sensorNoise);
