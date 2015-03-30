@@ -10,7 +10,7 @@
 #ifndef _Agent_h_included_
 #define _Agent_h_included_
 
-#include "globalConst.h"
+#include "constants.h"
 #include "HMM.h"
 #include <vector>
 #include "ANN.h"

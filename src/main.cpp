@@ -10,7 +10,7 @@
 #include <map>
 #include <iostream>
 
-#include "globalConst.h"
+#include "constants.h"
 #include "HMM.h"
 #include "Agent.h"
 #include "Game.h"

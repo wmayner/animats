@@ -13,7 +13,7 @@
 
 #include <vector>
 
-#include "globalConst.h"
+#include "constants.h"
 #include "Agent.h"
 #include "Game.h"
 
