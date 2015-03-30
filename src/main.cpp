@@ -14,6 +14,7 @@
 #include "HMM.h"
 #include "Agent.h"
 #include "Game.h"
+#include "analysis.h"
 
 #define randDouble ((double)rand() / (double)RAND_MAX)
 
@@ -76,7 +77,7 @@ int main(int argc, char *argv[]) {
         }
         if (update == game->nowUpdate) {
             for (i = 0; i < agent.size(); i++) {
-                game->makeSingleAgentAnalysis(agent[i], argv[4], i);
+                makeSingleAgentAnalysis(agent[i], argv[4], i);
             }
         }
 
@@ -123,7 +124,7 @@ int main(int argc, char *argv[]) {
         update++;
     }
     // Larissa: put noise to 0 for analysis
-    game->makeFullAnalysis(agent[0], argv[4], 0);
+    makeFullAnalysis(game, agent[0], argv[4], 0);
     saveLOD(game, agent[0], LOD, genomeFile);
     return 0;
 }

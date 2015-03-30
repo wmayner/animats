@@ -26,10 +26,6 @@ class Game {
     explicit Game(char* filename);
     ~Game();
 
-    void makeFullAnalysis(Agent *agent, char *fileLead, double sensorNoise);
-    void makeSingleAgentAnalysis(Agent *agent, char *fileLead, int agent_num);
-    double computeRGiven(vector<int> W, vector<int> S, vector<int> B, int
-            nrWstates, int nrSstates, int nrBstates);
     void applyNoise(Agent *agent, double sensorNoise);
     double agentDependentRandDouble(void);
     int agentDependentRandInt(void);
