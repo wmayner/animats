@@ -28,7 +28,7 @@ int totalGenerations = 32;
 char trialName[1000];
 double sensorNoise = 0.0;
 
-void saveLOD(Game *game, Agent *agent, FILE *statsFile, FILE *genomeFile);
+void saveLOD(Agent *agent, FILE *statsFile, FILE *genomeFile);
 
 int main(int argc, char *argv[]) {
     vector<Agent*> agent;
@@ -125,11 +125,11 @@ int main(int argc, char *argv[]) {
     }
     // Larissa: put noise to 0 for analysis
     makeFullAnalysis(game, agent[0], argv[4], 0);
-    saveLOD(game, agent[0], LOD, genomeFile);
+    saveLOD(agent[0], LOD, genomeFile);
     return 0;
 }
 
-void saveLOD(Game *game, Agent *agent, FILE *statsFile, FILE *genomeFile) {
+void saveLOD(Agent *agent, FILE *statsFile, FILE *genomeFile) {
     vector<Agent*> list;
     Agent *localAgent = agent;
     while (localAgent != NULL) {
@@ -139,7 +139,7 @@ void saveLOD(Game *game, Agent *agent, FILE *statsFile, FILE *genomeFile) {
     for (int i = (int)list.size() - 1; i > 0; i--) {
         agent = list[i];
         // TODO(wmayner) fix spacing with & below? and spelling of interval?
-        if ((agent->born&LOD_record_Intervall) == 0) {
+        if ((agent->born & LOD_record_interval) == 0) {
             // Larissa: set noise to 0 for analysis
             fprintf(statsFile, "%i   %i  %i", agent->born, agent->correct,
                     agent->incorrect);

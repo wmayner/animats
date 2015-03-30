@@ -86,7 +86,7 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int re
 
     // Block sizes
     for (i = 0; i < patterns.size(); i++) {
-        // Directions
+        // Directions (left/right)
         for (j = -1; j < 2; j+=2) {
             // Block fall
             for (k = 0; k < 16; k++) {

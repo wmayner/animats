@@ -14,6 +14,6 @@
 #define definedCue 0
 
 #define loopTicks 36
-#define LOD_record_Intervall 7 //63
+#define LOD_record_interval 7 //63
 
 #endif

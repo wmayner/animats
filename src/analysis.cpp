@@ -13,7 +13,7 @@ void makeFullAnalysis(Game *game, Agent *agent, char *fileLead, double
     int i, j;
     vector< vector<int> > table;
     while(agent != NULL) {
-        if((agent->born&LOD_record_Intervall) == 0) {
+        if((agent->born & LOD_record_interval) == 0) {
             // TPM transition list
             sprintf(filename, "%s_%i_FullLogicTable.txt", fileLead,
                     agent->born);
