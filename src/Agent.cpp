@@ -1,10 +1,4 @@
-/*
- *  Agent.cpp
- *  HMMBrain
- *
- *  Created by Arend on 9/16/10.
- *
- */
+// Agent.cpp
 
 #include "Agent.h"
 

@@ -1,11 +1,4 @@
-/*
- *  Agent.h
- *  HMMBrain
- *
- *  Created by Arend on 9/16/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
- *
- */
+// Agent.h
 
 #ifndef _SRC_AGENT_H_
 #define _SRC_AGENT_H_

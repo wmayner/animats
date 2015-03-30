@@ -1,8 +1,4 @@
-/*
- *  analysis.cpp
- *
- *  Created by Will Mayner on 3/27/15.
- */
+// analysis.cpp
 
 #include "analysis.h"
 

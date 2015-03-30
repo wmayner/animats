@@ -1,11 +1,4 @@
-/*
- *  HMM.h
- *  HMMBrain
- *
- *  Created by Arend on 9/16/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
- *
- */
+// HMM.h
 
 #ifndef _SRC_HMM_H_
 #define _SRC_HMM_H_

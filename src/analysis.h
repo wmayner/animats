@@ -1,9 +1,4 @@
-/*
- *  analysis.h
- *
- *  Created by Will Mayner on 3/27/15.
- *
- */
+// analysis.h
 
 #ifndef SRC_ANALYSIS_H_
 #define SRC_ANALYSIS_H_

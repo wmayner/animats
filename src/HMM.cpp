@@ -1,11 +1,4 @@
-/*
- *  HMM.cpp
- *  HMMBrain
- *
- *  Created by Arend on 9/16/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
- *
- */
+// HMM.cpp
 
 #include "HMM.h"
 // #define feedbackON

@@ -1,9 +1,4 @@
-/*
- *  measures.cpp
- *
- *  Created by Will Mayner on 3/30/15.
- *
- */
+// measures.cpp
 
 #include "measures.h"
 

@@ -1,9 +1,4 @@
-/*
- *  Game.cpp
- *  HMMBrain
- *
- *  Created by Arend on 9/23/10.
- */
+// Game.cpp
 
 #include "Game.h"
 

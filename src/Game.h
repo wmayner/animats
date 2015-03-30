@@ -1,10 +1,4 @@
-/*
- *  Game.h
- *  HMMBrain
- *
- *  Created by Arend on 9/23/10.
- *
- */
+// Game.h
 
 #ifndef SRC_GAME_H_
 #define SRC_GAME_H_

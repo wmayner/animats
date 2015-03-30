@@ -1,11 +1,4 @@
-/*
- *  ANN.cpp
- *  HMM_representations
- *
- *  Created by Arend on 12/20/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
- *
- */
+// ANN.cpp
 
 #include "ANN.h"
 

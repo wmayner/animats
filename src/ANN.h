@@ -1,11 +1,4 @@
-/*
- *  ANN.h
- *  HMM_representations
- *
- *  Created by Arend on 12/20/10.
- *  Copyright 2010 __MyCompanyName__. All rights reserved.
- *
- */
+// ANN.h
 
 #ifndef _SRC_ANN_H
 #define _SRC_ANN_H

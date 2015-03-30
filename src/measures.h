@@ -1,9 +1,4 @@
-/*
- *  measures.h
- *
- *  Created by Will Mayner on 3/30/15.
- *
- */
+// measures.h
 
 #ifndef SRC_MEASURES_H
 #define SRC_MEASURES_H
