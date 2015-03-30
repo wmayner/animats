@@ -19,8 +19,6 @@
 
 using namespace std;
 
-#define xDim 256
-#define yDim 16
 #define startMazes 1
 #define cPI 3.14159265
 
