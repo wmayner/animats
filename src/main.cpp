@@ -23,7 +23,7 @@ double perSiteMutationRate = 0.005;
 int update = 0;
 int repeats = 1;
 int maxAgent = 100;
-int totalGenerations = 4000;
+int totalGenerations = 32;
 char trialName[1000];
 double sensorNoise = 0.0;
 
@@ -70,7 +70,7 @@ int main(int argc, char *argv[]) {
         }
         for (i = 0; i < agent.size(); i++) {
             for (j = 0; j < repeats; j++) {
-                game->executeGame(agent[i], NULL, sensorNoise, j);
+                game->executeGame(agent[i], sensorNoise, j);
                 agent[i]->fitnesses.push_back((float)agent[i]->correct);
             }
         }
@@ -140,10 +140,8 @@ void saveLOD(Game *game, Agent *agent, FILE *statsFile, FILE *genomeFile) {
         // TODO(wmayner) fix spacing with & below? and spelling of interval?
         if ((agent->born&LOD_record_Intervall) == 0) {
             // Larissa: set noise to 0 for analysis
-            vector< vector<int> > T = game->executeGameLogStates(agent, 0);
-            double R = game->computeRGiven(T[2], T[3], T[4], 4, 2, 4);
-            fprintf(statsFile, "%i   %i  %i  %f", agent->born, agent->correct,
-                    agent->incorrect, R);
+            fprintf(statsFile, "%i   %i  %i", agent->born, agent->correct,
+                    agent->incorrect);
             for (int i = 0; i < agent->differentialCorrects.size(); i++) {
                 fprintf(statsFile, " %i", agent->differentialCorrects[i]);
             }

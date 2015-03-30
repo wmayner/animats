@@ -30,7 +30,7 @@ using namespace std;
 class Game {
  public:
     vector<int> patterns;
-    void executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat);
+    vector< vector<int> > executeGame(Agent* agent, double sensorNoise, int repeat = 0);
     explicit Game(char* filename);
     ~Game();
     double mutualInformation(vector<int> A, vector<int> B);
@@ -43,8 +43,6 @@ class Game {
     double computeOldR(vector< vector<int> > table);
     double entropy(vector<int> list);
 
-    vector< vector<int> > executeGameLogStates(Agent* agent, double
-            sensorNoise);
     void analyseKO(Agent* agent, int which, int setTo, double sensorNoise);
 
     void represenationPerNodeSummary(Agent* agent, char* filename, double

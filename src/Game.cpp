@@ -60,10 +60,14 @@ void Game::applyNoise(Agent *agent, double sensorNoise) {
     }
 }
 
-void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
+vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int repeat) {
     int world, botPos, blockPos;
-    int i, j, k, l, m;
+    int i, j, k, l, m, past_state, current_state;
     int action;
+    // This holds the state transitions over the animat's lifetime.
+    vector< vector<int> > stateTransitions;
+    stateTransitions.clear();
+    stateTransitions.resize(2);
     // Make random seeds unique from one another by including index.
     rndW = agent->ID + repeat;
     rndX = ~(agent->ID + repeat);
@@ -77,6 +81,7 @@ void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
 
     agent->differentialCorrects.resize(patterns.size());
 
+    // Record the number of correct outcomes for each different type of block
     for (i = 0; i < agent->differentialCorrects.size(); i++) {
         agent->differentialCorrects[i] = 0;
     }
@@ -120,7 +125,23 @@ void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
                     applyNoise(agent, sensorNoise);
                     // Set motors to 0 to prevent reading from them.
                     agent->states[6] = 0; agent->states[7] = 0;
+
+                    past_state = 0;
+                    for (int n = 0; n < 8; n++) {
+                        // Set the nth bit to the nth node's state
+                        past_state |= (agent->states[n] & 1) << n;
+                    }
+                    stateTransitions[0].push_back(past_state);
+
                     agent->updateStates();
+
+                    current_state = 0;
+                    for(int n = 0; n < 8; n++) {
+                        // Set the nth bit to the nth node's state
+                        current_state |= (agent->states[n] & 1) << n;
+                    }
+                    stateTransitions[1].push_back(current_state);
+
                     // Larissa: limit to one motor.
                     // agent->states[7]=0;
                     // if (agent->born < nowUpdate) {
@@ -196,126 +217,8 @@ void Game::executeGame(Agent* agent, FILE *f, double sensorNoise, int repeat) {
             }  // Block fall
         }  // Directions
     }  // Block sizes
+    return stateTransitions;
 }  // executeGame
-
-vector<vector<int> > Game::executeGameLogStates(Agent* agent, double sensorNoise){
-    int world, botPos, blockPos;
-    int i, j, k, l, m, T0, T1, u;
-    vector< vector<int> > retValue;
-    agent->fitness = 1.0;
-    agent->correct = agent->incorrect = 0;
-    rndW=agent->ID;  // Make random seeds unique from one another by including index.
-    rndX=~agent->ID;
-    rndY=agent->ID^0b01010101010101010101010101010101;
-    rndZ=agent->ID^0b10101010101010101010101010101010;
-    bool hit;
-    retValue.clear();
-    retValue.resize(6);
-    for (i = 0; i < patterns.size(); i++) {
-        for (j = -1; j < 2; j+=2) {
-            for (k = 0; k < 16; k++) {
-                //Larissa: Change environment after 30,000 Gen.
-                //if (agent->born > nowUpdate || i<2){
-//                if (agent->born > nowUpdate){
-                   world=patterns[i];
-//                    //cout<<world<<endl;
-//                } else{
-//                    //world=patterns[i-2];
-//                    if (i == 0 || i == 2) world=7;
-//                    else if (i==1 || i == 3) world=15;
-//                    //cout<<world<<endl;
-//                }
-                agent->resetBrain();
-                botPos=k;
-                blockPos=0;
-                //loop the world
-                for(l=0;l<loopTicks;l++){
-                    //                    for(m=0;m<16;m++)
-                    //                        printf("%i",(world>>m)&1);
-                    //                    printf("\n");
-
-                    //AH: Sensors have no noise in them now
-                    agent->states[0]=(world>>botPos)&1;
-                    agent->states[1]=(world>>((botPos+2)&15))&1;
-//                    agent->states[1]=0;
-
-//                    //Larissa: Set to 0 to evolve animats with just one sensor
-//                    if (agent->born > nowUpdate){
-//                        agent->states[0]=0;
-//                          agent->states[1]=(world>>((botPos+2)&15))&1;
-//                    }
-                    //AH: apply noise does apply noise to them now
-                    applyNoise(agent, sensorNoise);
-                    // set motors to 0 to preven reading from them
-                    agent->states[6]=0; agent->states[7]=0;
-                    T0=0;
-                    for(u=0;u<8;u++)
-                        T0|=(agent->states[u]&1)<<u;
-                    agent->updateStates();
-                    T1=0;
-                    for(u=0;u<8;u++)
-                        T1|=(agent->states[u]&1)<<u;
-                    int action=(agent->states[maxNodes-1])+(agent->states[maxNodes-2]<<1);
-                    retValue[0].push_back(T0);
-                    retValue[1].push_back(T1);
-                    int W=i<<1;
-                    if(j!=-1)
-                        W|=1;
-                    retValue[2].push_back(W);
-                    retValue[3].push_back((T0>>6)&3);
-                    retValue[4].push_back((T1>>2)&15);
-                    retValue[5].push_back(T1&3);
-                    //Larissa: limit to one Motor
-                    //agent->states[7]=0;
-//                    if (agent->born < nowUpdate){
-//                        agent->states[7]=0;
-//                    }
-                    action=agent->states[6]+(agent->states[7]<<1);
-                    switch(action){
-                        case 0:
-                        case 3:// nothing!
-                            break;
-                        case 1:
-                            botPos=(botPos+1)&15;
-                            break;
-                        case 2:
-                            botPos=(botPos-1)&15;
-                            break;
-                    }
-                    if(j==-1){
-                        world=((world>>1)&65535)+((world&1)<<15);
-                    } else {
-                        world=((world<<1)&65535)+((world>>15)&1);
-                    }
-                }
-                //check for hit
-                hit=false;
-                for(m=0;m<3;m++)
-                    if(((world>>((botPos+m)&15))&1)==1)
-                        hit=true;
-                if((i&1)==0){
-                    if(hit){
-                        agent->correct++;
-                        agent->fitness*=1.01;
-                    } else {
-                        agent->fitness/=1.01;
-                        agent->incorrect++;
-                    }
-                } else {
-                    if(hit){
-                        agent->incorrect++;
-                        agent->fitness/=1.01;
-                    } else {
-                        agent->correct++;
-                        agent->fitness*=1.01;
-                    }
-                }
-            }
-        }
-
-    }
-    return retValue;
-}
 
 void Game::analyseKO(Agent* agent,int which, int setTo,double sensorNoise){
     int world,botPos,blockPos;
@@ -573,77 +476,6 @@ double Game::predictNextInput(vector<int>A){
     return mutualInformation(S, I);
 }
 
-void Game::represenationPerNodeSummary(Agent* agent,char* filename,double sensorNoise){
-    vector<vector<int> > table=executeGameLogStates(agent,sensorNoise);
-    int W,B;
-    int i,j;
-    double R;
-    int bitsumW,bitsumB;
-    double maxR;
-    int minP,bestPartition;
-    FILE *F=fopen(filename,"w+t");
-    vector<int> world,sensors,brain;
-    cout<<"fitness of agent: "<<agent->correct<<endl;
-    world.resize(table[0].size());
-    sensors.resize(table[0].size());
-    brain.resize(table[0].size());
-    for(W=1;W<16;W=W<<1){
-        maxR=0.0;
-        bestPartition=0;
-        for(B=1;B<16;B++){
-            //cout<<W<<" "<<B<<" ";
-            //fprintf(F,"%i   %i  ",W,B);
-            bitsumW=0;
-            bitsumB=0;
-            for(i=0;i<4;i++){
-                //cout<<((W>>i)&1)<<" ";
-                //fprintf(F,"%i   ",((W>>i)&1));
-                bitsumW+=(W>>i)&1;
-            }
-            for(i=0;i<4;i++){
-                //cout<<((B>>i)&1)<<" ";
-                //fprintf(F,"%i   ",((B>>i)&1));
-                bitsumB+=(B>>i)&1;
-            }
-            //cout<<bitsumW<<" "<<bitsumB<<" ";
-            //fprintf(F,"%i   %i  ",bitsumW,bitsumB);
-            for(j=0;j<table[0].size();j++){
-                world[j]=table[2][j]&W;
-                sensors[j]=table[3][j];
-                brain[j]=table[4][j]&B;
-            }
-            R=computeRGiven(world, sensors, brain, 4,2,4);
-            if(R<0.0) R=0.0;
-            if(R==maxR){
-                if(bitsumB<minP){
-                    minP=bitsumB;
-                    bestPartition=B;
-                }
-            }
-            if(R>maxR){
-                maxR=R;
-                minP=bitsumB;
-                bestPartition=B;
-            }
-            //cout<<R<<endl;
-            //fprintf(F,"%f\n",R);
-        }
-        cout<<W<<" "<<bestPartition<<" ";
-        fprintf(F,"%i   %i  ",W,bestPartition);
-        for(i=0;i<4;i++){
-            cout<<((W>>i)&1)<<" ";
-            fprintf(F,"%i   ",((W>>i)&1));
-        }
-        for(i=0;i<4;i++){
-            cout<<((bestPartition>>i)&1)<<" ";
-            fprintf(F,"%i   ",((bestPartition>>i)&1));
-        }
-        cout<<R<<endl;
-        fprintf(F,"%f\n",R);
-    }
-    fclose(F);
-}
-
 void Game::makeFullAnalysis(Agent *agent,char *fileLead,double sensorNoise){
     char filename[1000];
     FILE *f;
@@ -651,9 +483,6 @@ void Game::makeFullAnalysis(Agent *agent,char *fileLead,double sensorNoise){
     vector<vector<int> > table;
     while(agent!=NULL){
         if((agent->born&LOD_record_Intervall)==0){
-            //representation table
-            sprintf(filename,"%s_%i_representation.txt",fileLead,agent->born);
-            represenationPerNodeSummary(agent, filename,sensorNoise);
             //state to state table
             sprintf(filename,"%s_%i_FullLogicTable.txt",fileLead,agent->born);
             f=fopen(filename,"w+t");
@@ -661,8 +490,8 @@ void Game::makeFullAnalysis(Agent *agent,char *fileLead,double sensorNoise){
             fclose(f);
             //state to state table for only the lifetime
             sprintf(filename,"%s_%i_LifetimeLogicTable.txt",fileLead,agent->born);
-            f=fopen(filename,"w+t");
-            table=this->executeGameLogStates(agent,sensorNoise);
+            f = fopen(filename,"w+t");
+            table = this->executeGame(agent, sensorNoise);
             for(i=0;i<8;i++)
                 fprintf(f,"T0_%i,",i);
             fprintf(f,",");
@@ -682,7 +511,7 @@ void Game::makeFullAnalysis(Agent *agent,char *fileLead,double sensorNoise){
             //ko table
             sprintf(filename,"%s_%i_KOdata.txt",fileLead,agent->born);
             f=fopen(filename,"w+t");
-            executeGameLogStates(agent,sensorNoise);
+            executeGame(agent, sensorNoise);
             fprintf(f,"%i",agent->correct);
             for(i=0;i<8;i++)
                 for(j=0;j<2;j++){
@@ -719,25 +548,4 @@ void Game::makeSingleAgentAnalysis(Agent *agent,char *fileLead, int agent_num){
     //dot file
     sprintf(filename,"%s_%i_%i_EdgeList.txt",fileLead,agent->born, agent_num);
     agent->saveEdgeList(filename);
-}
-
-double Game::computeRGiven(vector<int>W,vector<int>S,vector<int>B,int nrWstates,int nrSstates,int nrBstates){
-    double Iwh, Iws, Ish, Hh, Hs, Hw, Hhws, delta, R;
-    int i;
-    vector<int> total;
-    total.clear();
-    for(i = 0; i < W.size(); i++) {
-        total.push_back(
-                (W[i] << (nrBstates+nrWstates)) + (S[i] << nrBstates) + B[i]);
-    }
-    Iwh = mutualInformation(W, B);
-    Iws = mutualInformation(W, S);
-    Ish = mutualInformation(S, B);
-    Hh = entropy(B);
-    Hs = entropy(S);
-    Hw = entropy(W);
-    Hhws = entropy(total);
-    delta = Hhws + Iwh + Iws + Ish - Hh - Hs - Hw;
-    R = Iwh - delta;
-    return R;
 }
