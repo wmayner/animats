@@ -1,6 +1,8 @@
 // analysis.cpp
 
-#include "analysis.h"
+#include <vector>
+
+#include "./analysis.h"
 
 
 void makeFullAnalysis(Game *game, Agent *agent, char *fileLead, double
@@ -9,16 +11,16 @@ void makeFullAnalysis(Game *game, Agent *agent, char *fileLead, double
     FILE *f;
     int i, j;
     vector< vector<int> > table;
-    while(agent != NULL) {
-        if((agent->born & LOD_record_interval) == 0) {
+    while (agent != NULL) {
+        if ((agent->born & LOD_record_interval) == 0) {
             // TPM transition list
-            sprintf(filename, "%s_%i_FullLogicTable.txt", fileLead,
+            snprintf(filename, "%s_%i_FullLogicTable.txt", fileLead,
                     agent->born);
             f = fopen(filename, "w+t");
             agent->saveLogicTable(f);
             fclose(f);
             // Lifetime transition list
-            sprintf(filename, "%s_%i_LifetimeLogicTable.txt", fileLead,
+            snprintf(filename, "%s_%i_LifetimeLogicTable.txt", fileLead,
                     agent->born);
             f = fopen(filename, "w+t");
             table = game->executeGame(agent, sensorNoise);
@@ -42,7 +44,7 @@ void makeFullAnalysis(Game *game, Agent *agent, char *fileLead, double
             }
             fclose(f);
             // Edge list
-            sprintf(filename, "%s_%i_EdgeList.txt", fileLead, agent->born);
+            snprintf(filename, "%s_%i_EdgeList.txt", fileLead, agent->born);
             agent->saveEdgeList(filename);
         }
         agent = agent->ancestor;
@@ -53,22 +55,23 @@ void makeSingleAgentAnalysis(Agent *agent, char *fileLead, int agent_num) {
     char filename[1000];
     FILE *f;
     // TPM transition list
-    sprintf(filename, "%s_%i_%i_FullLogicTable.txt", fileLead, agent->born,
+    snprintf(filename, "%s_%i_%i_FullLogicTable.txt", fileLead, agent->born,
             agent_num);
-    f=fopen(filename, "w+t");
+    f = fopen(filename, "w+t");
     agent->saveLogicTableSingleAnimat(f);
     fclose(f);
     // Fitness value
-    sprintf(filename, "%s_%i_Fitness.txt", fileLead, agent->born);
+    snprintf(filename, "%s_%i_Fitness.txt", fileLead, agent->born);
     if (agent_num == 0) {
-        f=fopen(filename, "w+t");
+        f = fopen(filename, "w+t");
     } else {
-        f=fopen(filename, "a");
+        f = fopen(filename, "a");
     }
     fprintf(f, "%i", agent->correct);
     fprintf(f, "\n");
     fclose(f);
     // Edge list
-    sprintf(filename, "%s_%i_%i_EdgeList.txt", fileLead, agent->born, agent_num);
+    snprintf(filename, "%s_%i_%i_EdgeList.txt", fileLead, agent->born,
+            agent_num);
     agent->saveEdgeList(filename);
 }

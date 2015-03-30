@@ -1,7 +1,7 @@
 // measures.h
 
-#ifndef SRC_MEASURES_H
-#define SRC_MEASURES_H
+#ifndef SRC_MEASURES_H_
+#define SRC_MEASURES_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -20,4 +20,4 @@ double nonPredictiveI(vector<int> A);
 double predictNextInput(vector<int> A);
 double entropy(vector<int> list);
 
-#endif  // SRC_MEASURES_H
+#endif  // SRC_MEASURES_H_

@@ -1,5 +1,7 @@
 // Game.cpp
 
+#include <vector>
+
 #include "Game.h"
 
 // TODO(wmayner) figure out and document cruel black magic voodoo sorcery
@@ -42,7 +44,7 @@ int Game::agentDependentRandInt(void) {
 
 void Game::applyNoise(Agent *agent, double sensorNoise) {
     // Larissa: If I don't have noise in evaluation, then I can just use random
-    // numbers always.
+    // numbers always
     // if (agentDependentRandDouble() < sensorNoise) {
     if (randDouble < sensorNoise) {
         agent->states[0] = !agent->states[0];
@@ -53,15 +55,16 @@ void Game::applyNoise(Agent *agent, double sensorNoise) {
     }
 }
 
-vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int repeat) {
+vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
+        repeat) {
     int world, agentPosition, blockPos, past_state, current_state;
     int patternIndex, direction, timestep, agentCell;
     int action;
-    // This holds the state transitions over the agent's lifetime.
+    // This holds the state transitions over the agent's lifetime
     vector< vector<int> > stateTransitions;
     stateTransitions.clear();
     stateTransitions.resize(2);
-    // Make random seeds unique from one another by including index.
+    // Make random seeds unique from one another by including index
     rndW = agent->ID + repeat;
     rndX = ~(agent->ID + repeat);
     rndY = (agent->ID + repeat)^0b01010101010101010101010101010101;
@@ -100,16 +103,17 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int re
 
                 // World loop
                 for (timestep = 0; timestep < numWorldTimesteps; timestep++) {
-                    // AH: Sensors have no noise in them now.
+                    // AH: Sensors have no noise in them now
                     agent->states[0] = (world >> agentPosition) & 1;
-                    agent->states[1] = (world >> ((agentPosition + 2) & 15)) & 1;
+                    agent->states[1] = (world >> ((agentPosition + 2) & 15))
+                        & 1;
 
                     // TODO(wmayner) parameterize changing sensors mid-evolution
-                    // Larissa: Set to 0 to evolve agents with just one sensor.
+                    // Larissa: Set to 0 to evolve agents with just one sensor
 
-                    // AH: Apply noise does apply noise to them now.
+                    // AH: Apply noise does apply noise to them now
                     applyNoise(agent, sensorNoise);
-                    // Set motors to 0 to prevent reading from them.
+                    // Set motors to 0 to prevent reading from them
                     agent->states[6] = 0; agent->states[7] = 0;
 
                     past_state = 0;
@@ -122,14 +126,14 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int re
                     agent->updateStates();
 
                     current_state = 0;
-                    for(int n = 0; n < 8; n++) {
+                    for (int n = 0; n < 8; n++) {
                         // Set the nth bit to the nth node's state
                         current_state |= (agent->states[n] & 1) << n;
                     }
                     stateTransitions[1].push_back(current_state);
 
                     // TODO(wmayner) parameterize this
-                    // Larissa: limit to one motor.
+                    // Larissa: limit to one motor
                     // agent->states[7]=0;
                     // if (agent->born < nowUpdate) {
                     //     agent->states[7] = 0;
@@ -140,47 +144,48 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int re
                     // Larissa: this makes the agent stop moving:
                     // action = 0;
                     switch (action) {
-                        // No motors on.
+                        // No motors on
                         case 0:
-                            // Don't move.
+                            // Don't move
                             break;
-                        // Both motors on.
+                        // Both motors on
                         case 3:
-                            // Don't move.
+                            // Don't move
                             break;
-                        // Left motor on.
+                        // Left motor on
                         case 1:
-                            // Move right.
+                            // Move right
                             // TODO(wmayner) replace with constant
                             agentPosition = (agentPosition + 1) & 15;
                             break;
-                        // Right motor on.
+                        // Right motor on
                         case 2:
-                            // Move left.
+                            // Move left
                             // TODO(wmayner) replace with constant
                             agentPosition = (agentPosition - 1) & 15;
                             break;
                     }
 
-                    // Move the block.
+                    // Move the block
                     if (direction == -1) {
-                        // Left.
+                        // Left
                         world = ((world >> 1) & 65535) + ((world & 1) << 15);
                     } else {
-                        // Right.
+                        // Right
                         world = ((world << 1) & 65535) + ((world >> 15) & 1);
                     }
                 }
 
-                // Check for hit.
+                // Check for hit
                 hit = false;
                 for (agentCell = 0; agentCell < 3; agentCell++) {
-                    if (((world >> ((agentPosition + agentCell) & 15)) & 1) == 1) {
+                    if (((world >> ((agentPosition + agentCell) & 15)) & 1)
+                            == 1) {
                         hit = true;
                     }
                 }
 
-                // Update fitness.
+                // Update fitness
                 if ((patternIndex & 1) == 0) {
                     if (hit) {
                         agent->correct++;

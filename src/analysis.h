@@ -8,13 +8,14 @@
 
 #include <vector>
 
-#include "constants.h"
-#include "Agent.h"
-#include "Game.h"
+#include "./constants.h"
+#include "./Agent.h"
+#include "./Game.h"
 
 using namespace std;
 
-void makeFullAnalysis(Game *game, Agent *agent, char *fileLead, double sensorNoise);
+void makeFullAnalysis(Game *game, Agent *agent, char *fileLead, double
+        sensorNoise);
 void makeSingleAgentAnalysis(Agent *agent, char *fileLead, int agent_num);
 
 #endif  // SRC_ANALYSIS_H_

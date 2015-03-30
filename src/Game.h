@@ -8,15 +8,16 @@
 
 #include <vector>
 
-#include "constants.h"
-#include "Agent.h"
+#include "./constants.h"
+#include "./Agent.h"
 
 using namespace std;
 
 class Game {
  public:
     vector<int> patterns;
-    vector< vector<int> > executeGame(Agent* agent, double sensorNoise, int repeat = 0);
+    vector< vector<int> > executeGame(Agent* agent, double sensorNoise, int
+            repeat = 0);
     explicit Game(char* filename);
     ~Game();
 

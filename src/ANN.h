@@ -11,7 +11,7 @@
 #include <deque>
 #include <iostream>
 
-#include "constants.h"
+#include "./constants.h"
 
 using namespace std;
 class Layer{

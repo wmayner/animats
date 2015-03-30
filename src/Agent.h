@@ -8,9 +8,9 @@
 
 #include <vector>
 
-#include "constants.h"
-#include "HMM.h"
-#include "ANN.h"
+#include "./constants.h"
+#include "./HMM.h"
+#include "./ANN.h"
 
 //#define useANN
 

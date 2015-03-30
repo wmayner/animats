@@ -12,18 +12,18 @@
 #include <map>
 #include <iostream>
 
-#include "constants.h"
-#include "HMM.h"
-#include "Agent.h"
-#include "Game.h"
-#include "analysis.h"
+#include "./constants.h"
+#include "./HMM.h"
+#include "./Agent.h"
+#include "./Game.h"
+#include "./analysis.h"
 
 #define randDouble ((double)rand() / (double)RAND_MAX)
 
 using namespace std;
 
 double perSiteMutationRate = 0.005;
-int update = 0;
+int generation = 0;
 int repeats = 1;
 int numAgents = 100;
 int numGenerations = 32;
@@ -67,7 +67,7 @@ int main(int argc, char *argv[]) {
     nextGen.resize(agent.size());
     masterAgent->nrPointingAtMe--;
     cout << "Setup complete." << endl;
-    while (update < numGenerations) {
+    while (generation < numGenerations) {
         for (i = 0; i < agent.size(); i++) {
             agent[i]->fitness = 0.0;
             agent[i]->fitnesses.clear();
@@ -78,7 +78,7 @@ int main(int argc, char *argv[]) {
                 agent[i]->fitnesses.push_back((float)agent[i]->correct);
             }
         }
-        if (update == game->nowUpdate) {
+        if (generation == game->nowUpdate) {
             for (i = 0; i < agent.size(); i++) {
                 makeSingleAgentAnalysis(agent[i], argv[4], i);
             }
@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        cout << update << " " << (double)maxFitness << ""
+        cout << generation << " " << (double)maxFitness << ""
             " " << agent[who]->correct << "/" << agent[who]->incorrect << ""
             " " << (float)agent[who]->correct / (83.0 * 82.0) << endl;
 
@@ -113,7 +113,7 @@ int main(int argc, char *argv[]) {
             do {
                 j = rand() % (int)agent.size();
             } while (randDouble > (agent[j]->fitness / maxFitness));
-            d->inherit(agent[j], perSiteMutationRate, update);
+            d->inherit(agent[j], perSiteMutationRate, generation);
             nextGen[i] = d;
         }
         for (i = 0; i < agent.size(); i++) {
@@ -124,7 +124,7 @@ int main(int argc, char *argv[]) {
             agent[i] = nextGen[i];
         }
         agent = nextGen;
-        update++;
+        generation++;
     }
     // Larissa: put noise to 0 for analysis
     makeFullAnalysis(game, agent[0], argv[4], 0);
