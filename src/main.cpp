@@ -30,6 +30,7 @@ double sensorNoise = 0.0;
 
 void saveLOD(Agent *agent, FILE *statsFile, FILE *genomeFile);
 
+
 int main(int argc, char *argv[]) {
     vector<Agent*> agent;
     vector<Agent*> nextGen;

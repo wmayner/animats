@@ -7,16 +7,17 @@
  *
  */
 
-#ifndef _Agent_h_included_
-#define _Agent_h_included_
+#ifndef _SRC_AGENT_H_
+#define _SRC_AGENT_H_
 
-#include "constants.h"
-#include "HMM.h"
-#include <vector>
-#include "ANN.h"
 #include <stdio.h>
 #include <stdlib.h>
 
+#include <vector>
+
+#include "constants.h"
+#include "HMM.h"
+#include "ANN.h"
 
 //#define useANN
 
@@ -42,20 +43,20 @@ public:
 
 	Agent *ancestor;
 	unsigned int nrPointingAtMe;
-	unsigned char states[numNodes],newStates[numNodes];
-	double fitness,convFitness;
+	unsigned char states[numNodes], newStates[numNodes];
+	double fitness, convFitness;
 	vector<double> fitnesses;
 	int food;
 
-	double xPos,yPos,direction;
-	double sX,sY;
+	double xPos, yPos, direction;
+	double sX, sY;
 	bool foodAlreadyFound;
-	int steps,bestSteps,totalSteps;
-	int ID,nrOfOffspring;
+	int steps, bestSteps, totalSteps;
+	int ID, nrOfOffspring;
 	bool saved;
 	bool retired;
 	int born;
-	int correct,incorrect;
+	int correct, incorrect;
     vector<int> numCorrectByPattern;
 
 	Agent();
@@ -64,7 +65,7 @@ public:
 	void loadAgent(char* filename);
 	void loadAgentWithTrailer(char* filename);
 	void setupPhenotype(void);
-	void inherit(Agent *from,double mutationRate,int theTime);
+	void inherit(Agent *from, double mutationRate, int theTime);
 	unsigned char * getStatesPointer(void);
 	void updateStates(void);
 	void resetBrain(void);
@@ -76,14 +77,14 @@ public:
 
 	void initialize(int x, int y, int d);
 	Agent* findLMRCA(void);
-	void saveFromLMRCAtoNULL(FILE *statsFile,FILE *genomeFile);
-	void saveLOD(FILE *statsFile,FILE *genomeFile);
+	void saveFromLMRCAtoNULL(FILE *statsFile, FILE *genomeFile);
+	void saveLOD(FILE *statsFile, FILE *genomeFile);
 	void retire(void);
-	void setupDots(int x, int y,double spacing);
+	void setupDots(int x, int y, double spacing);
 	void saveLogicTable(FILE *f);
     void saveLogicTableSingleAnimat(FILE *f);
 	void saveGenome(FILE *f);
     void saveEdgeList(char *filename);
 };
 
-#endif
+#endif  // _SRC_AGENT_H_

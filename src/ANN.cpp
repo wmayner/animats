@@ -8,9 +8,9 @@
  */
 
 #include "ANN.h"
-#include <math.h>
 
-void tLayer::setup(int n_in,int n_out){
+
+void Layer::setup(int n_in,int n_out){
 	int i,j;
 	weights.resize(n_in);
 	for(i=0;i<n_in;i++){
@@ -24,7 +24,7 @@ void tLayer::setup(int n_in,int n_out){
 	for(i=0;i<n_out;i++) outStates[i]=0.0;
 }
 
-void tLayer::update(bool useTanH){
+void Layer::update(bool useTanH){
 	int i,j;
 	for(i=0;i<outStates.size();i++)
 		outStates[i]=0.0;

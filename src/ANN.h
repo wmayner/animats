@@ -7,34 +7,37 @@
  *
  */
 
-#ifndef _ANN_h_included_
-#define _ANN_h_included_
+#ifndef _SRC_ANN_H
+#define _SRC_ANN_H
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
 
 #include <vector>
 #include <deque>
 #include <iostream>
+
 #include "constants.h"
-#include <stdio.h>
-#include <stdlib.h>
 
 using namespace std;
-class tLayer{
+class Layer{
 public:
 	vector<vector<double> > weights;
-	vector<double> inStates,outStates;
-	void setup(int n_in,int n_out);
+	vector<double> inStates, outStates;
+	void setup(int n_in, int n_out);
 	void update(bool useTanH);
 };
 
 class ANN{
 public:
-	vector<tLayer> layers;
+	vector<Layer> layers;
 	void setup(void);
-	void inherit(ANN *ancestor,double mutationRate);
+	void inherit(ANN *ancestor, double mutationRate);
 	void saveLOD(FILE *genomeFile);
 	void load(char *filename);
 	void update(unsigned char *states);
 	void resetBrain(void);
 };
 
-#endif
+#endif  // _SRC_ANN_H

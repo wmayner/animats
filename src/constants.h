@@ -14,4 +14,4 @@
 #define numWorldTimesteps 36
 #define LOD_record_interval 7
 
-#endif // _SRC_CONSTANTS_H_
+#endif  // _SRC_CONSTANTS_H_

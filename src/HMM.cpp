@@ -8,8 +8,8 @@
  */
 
 #include "HMM.h"
-#include <iostream>
-//#define feedbackON
+// #define feedbackON
+
 
 HMMU::HMMU(){
 }

@@ -8,6 +8,7 @@
 
 #include "Agent.h"
 
+
 Agent::Agent(){
 	int i;
 	nrPointingAtMe=1;
