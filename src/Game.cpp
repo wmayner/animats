@@ -28,7 +28,7 @@ Game::Game(char* filename) {
     patterns.clear();
     while (!feof(f)) {
         fscanf(f, "%i  ", &i);
-        patterns.push_back(i&65535);
+        patterns.push_back(i & 65535);
     }
     fclose(f);
 }
@@ -93,32 +93,26 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int re
                 // Larissa: Change environment after 30,000 Gen, if patterns is
                 // 1 7 15 3 it changes from 2 blocks with 1 7 to 4 blocks with
                 // 1 7 15 3
+
+                // TODO(wmayner) add logic outside of Game to change the
+                // patterns mid-evolution
+
                 world = patterns[i];
-                // if (agent->born > nowUpdate || i < 2) {
-                // if (agent->born > nowUpdate) {
-                //     world = patterns[i];
-                // } else{
-                //     // world = patterns[i-2];
-                //     if (i == 0 || i == 2) world = 7;
-                //     else if (i==1 || i == 3) world = 15;
-                // }
+
                 agent->resetBrain();
+
                 botPos = k;
                 blockPos = 0;
+
                 // World loop
                 for (l = 0; l < loopTicks; l++) {
-                    // for(m=0;m<16;m++)
-                    //     printf("%i",(world>>m)&1);
-                    // printf("\n");
                     // AH: Sensors have no noise in them now.
                     agent->states[0] = (world >> botPos) & 1;
-                    // agent->states[1] = 0;
                     agent->states[1] = (world >> ((botPos + 2) & 15)) & 1;
+
+                    // TODO(wmayner) parameterize changing sensors mid-evolution
                     // Larissa: Set to 0 to evolve animats with just one sensor.
-                    // if (agent->born > nowUpdate) {
-                    //     agent->states[0] = 0;
-                    //     agent->states[1] = (world >> ((botPos + 2) & 15)) & 1;
-                    // }
+
                     // AH: Apply noise does apply noise to them now.
                     applyNoise(agent, sensorNoise);
                     // Set motors to 0 to prevent reading from them.
@@ -140,6 +134,7 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int re
                     }
                     stateTransitions[1].push_back(current_state);
 
+                    // TODO(wmayner) parameterize this
                     // Larissa: limit to one motor.
                     // agent->states[7]=0;
                     // if (agent->born < nowUpdate) {
