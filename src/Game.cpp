@@ -265,37 +265,6 @@ double Game::entropy(vector<int> list){
     return -1.0*H;
 }
 
-double Game::computeR(vector<vector<int> > table,int howFarBack){
-    double Iwh,Iws,Ish,Hh,Hs,Hw,Hhws,delta,R;
-    int i;
-    for(i=0;i<howFarBack;i++){
-        table[0].erase(table[0].begin());
-        table[1].erase(table[1].begin());
-        table[2].erase(table[2].begin()+(table[2].size()-1));
-    }
-    table[4].clear();
-    for(i=0;i<table[0].size();i++){
-        table[4].push_back((table[0][i]<<14)+(table[1][i]<<10)+table[2][i]);
-    }
-    Iwh=mutualInformation(table[0],table[2]);
-    Iws=mutualInformation(table[0],table[1]);
-    Ish=mutualInformation(table[1],table[2]);
-    Hh=entropy(table[2]);
-    Hs=entropy(table[1]);
-    Hw=entropy(table[0]);
-    Hhws=entropy(table[4]);
-    delta=Hhws+Iwh+Iws+Ish-Hh-Hs-Hw;
-    R=Iwh-delta;
-    return R;
-}
-
-double Game::computeOldR(vector<vector<int> > table){
-    double Ia,Ib;
-    Ia=mutualInformation(table[0], table[2]);
-    Ib=mutualInformation(table[1], table[2]);
-    return Ib-Ia;
-}
-
 double Game::predictiveI(vector<int>A){
     vector<int> S,I;
     S.clear(); I.clear();
