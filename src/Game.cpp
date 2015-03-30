@@ -265,55 +265,6 @@ double Game::entropy(vector<int> list){
     return -1.0*H;
 }
 
-double Game::ei(vector<int> A,vector<int> B,int theMask){
-    set<int> nrA,nrB;
-    set<int>::iterator aI,bI;
-    map<int,map<int,double> > pXY;
-    map<int,double> pX,pY;
-    int i;
-    double c=1.0/(double)A.size();
-    double I=0.0;
-    for(i=0;i<A.size();i++){
-        nrA.insert(A[i]&theMask);
-        nrB.insert(B[i]&theMask);
-        pX[A[i]&theMask]=0.0;
-        pY[B[i]&theMask]=0.0;
-    }
-    for(aI=nrA.begin();aI!=nrA.end();aI++)
-        for(bI=nrB.begin();bI!=nrB.end();bI++){
-            pXY[*aI][*bI]=0.0;
-        }
-    for(i=0;i<A.size();i++){
-        pXY[A[i]&theMask][B[i]&theMask]+=c;
-        pX[A[i]&theMask]+=c;
-        pY[B[i]&theMask]+=c;
-    }
-    for(aI=nrA.begin();aI!=nrA.end();aI++)
-        for(bI=nrB.begin();bI!=nrB.end();bI++)
-            if((pX[*aI]!=0.0)&&(pY[*bI]!=0.0)&&(pXY[*aI][*bI]!=0.0))
-                I+=pXY[*aI][*bI]*log2(pXY[*aI][*bI]/(pY[*bI]));
-    return -I;
-}
-
-double Game::computeAtomicPhi(vector<int>A,int states){
-    int i;
-    double P,EIsystem;
-    vector<int> T0,T1;
-    T0=A;
-    T1=A;
-    T0.erase(T0.begin()+T0.size()-1);
-    T1.erase(T1.begin());
-    EIsystem=ei(T0,T1,(1<<states)-1);
-    P=0.0;
-    for(i=0;i<states;i++){
-        double EIP=ei(T0,T1,1<<i);
-//      cout<<EIP<<endl;
-        P+=EIP;
-    }
-//  cout<<-EIsystem+P<<" "<<EIsystem<<" "<<P<<" "<<T0.size()<<" "<<T1.size()<<endl;
-    return -EIsystem+P;
-}
-
 double Game::computeR(vector<vector<int> > table,int howFarBack){
     double Iwh,Iws,Ish,Hh,Hs,Hw,Hhws,delta,R;
     int i;
