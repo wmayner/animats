@@ -59,10 +59,10 @@ void Game::applyNoise(Agent *agent, double sensorNoise) {
 }
 
 vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int repeat) {
-    int world, botPos, blockPos;
-    int i, j, k, l, m, past_state, current_state;
+    int world, agentPosition, blockPos, past_state, current_state;
+    int patternIndex, direction, timestep, agentCell;
     int action;
-    // This holds the state transitions over the animat's lifetime.
+    // This holds the state transitions over the agent's lifetime.
     vector< vector<int> > stateTransitions;
     stateTransitions.clear();
     stateTransitions.resize(2);
@@ -77,19 +77,19 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int re
 
     bool hit;
 
-    agent->differentialCorrects.resize(patterns.size());
+    agent->numCorrectByPattern.resize(patterns.size());
 
     // Record the number of correct outcomes for each different type of block
-    for (i = 0; i < agent->differentialCorrects.size(); i++) {
-        agent->differentialCorrects[i] = 0;
+    for (int i = 0; i < agent->numCorrectByPattern.size(); i++) {
+        agent->numCorrectByPattern[i] = 0;
     }
 
-    // Block sizes
-    for (i = 0; i < patterns.size(); i++) {
+    // Block patterns
+    for (patternIndex = 0; patternIndex < patterns.size(); patternIndex++) {
         // Directions (left/right)
-        for (j = -1; j < 2; j+=2) {
-            // Block fall
-            for (k = 0; k < 16; k++) {
+        for (direction = -1; direction < 2; direction += 2) {
+            // Agent starting position
+            for (agentPosition = 0; agentPosition < 16; agentPosition++) {
                 // Larissa: Change environment after 30,000 Gen, if patterns is
                 // 1 7 15 3 it changes from 2 blocks with 1 7 to 4 blocks with
                 // 1 7 15 3
@@ -97,21 +97,20 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int re
                 // TODO(wmayner) add logic outside of Game to change the
                 // patterns mid-evolution
 
-                world = patterns[i];
+                world = patterns[patternIndex];
 
                 agent->resetBrain();
 
-                botPos = k;
                 blockPos = 0;
 
                 // World loop
-                for (l = 0; l < loopTicks; l++) {
+                for (timestep = 0; timestep < numWorldTimesteps; timestep++) {
                     // AH: Sensors have no noise in them now.
-                    agent->states[0] = (world >> botPos) & 1;
-                    agent->states[1] = (world >> ((botPos + 2) & 15)) & 1;
+                    agent->states[0] = (world >> agentPosition) & 1;
+                    agent->states[1] = (world >> ((agentPosition + 2) & 15)) & 1;
 
                     // TODO(wmayner) parameterize changing sensors mid-evolution
-                    // Larissa: Set to 0 to evolve animats with just one sensor.
+                    // Larissa: Set to 0 to evolve agents with just one sensor.
 
                     // AH: Apply noise does apply noise to them now.
                     applyNoise(agent, sensorNoise);
@@ -142,8 +141,8 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int re
                     // }
                     action = agent->states[6] + (agent->states[7] << 1);
 
-                    // Move animat
-                    // Larissa: this makes the animat stop moving:
+                    // Move agent
+                    // Larissa: this makes the agent stop moving:
                     // action = 0;
                     switch (action) {
                         // No motors on.
@@ -158,18 +157,18 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int re
                         case 1:
                             // Move right.
                             // TODO(wmayner) replace with constant
-                            botPos = (botPos + 1) & 15;
+                            agentPosition = (agentPosition + 1) & 15;
                             break;
                         // Right motor on.
                         case 2:
                             // Move left.
                             // TODO(wmayner) replace with constant
-                            botPos = (botPos - 1) & 15;
+                            agentPosition = (agentPosition - 1) & 15;
                             break;
                     }
 
                     // Move the block.
-                    if (j == -1) {
+                    if (direction == -1) {
                         // Left.
                         world = ((world >> 1) & 65535) + ((world & 1) << 15);
                     } else {
@@ -180,19 +179,19 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int re
 
                 // Check for hit.
                 hit = false;
-                for (m = 0; m < 3; m++) {
-                    if (((world >> ((botPos + m) & 15)) & 1) == 1) {
+                for (agentCell = 0; agentCell < 3; agentCell++) {
+                    if (((world >> ((agentPosition + agentCell) & 15)) & 1) == 1) {
                         hit = true;
                     }
                 }
 
                 // Update fitness.
-                if ((i & 1) == 0) {
+                if ((patternIndex & 1) == 0) {
                     // TODO(wmayner) replace 1.01s with constant
                     if (hit) {
                         agent->correct++;
                         agent->fitness *= 1.01;
-                        agent->differentialCorrects[i]++;
+                        agent->numCorrectByPattern[patternIndex]++;
                     } else {
                         agent->fitness /= 1.01;
                         agent->incorrect++;
@@ -204,11 +203,11 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int re
                     } else {
                         agent->correct++;
                         agent->fitness *= 1.01;
-                        agent->differentialCorrects[i]++;
+                        agent->numCorrectByPattern[patternIndex]++;
                     }
                 }
-            }  // Block fall
+            }  // Agent starting position
         }  // Directions
-    }  // Block sizes
+    }  // Block patterns
     return stateTransitions;
 }  // executeGame

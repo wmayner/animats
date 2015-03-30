@@ -42,7 +42,7 @@ public:
 
 	Agent *ancestor;
 	unsigned int nrPointingAtMe;
-	unsigned char states[maxNodes],newStates[maxNodes];
+	unsigned char states[numNodes],newStates[numNodes];
 	double fitness,convFitness;
 	vector<double> fitnesses;
 	int food;
@@ -56,7 +56,7 @@ public:
 	bool retired;
 	int born;
 	int correct,incorrect;
-    vector<int> differentialCorrects;
+    vector<int> numCorrectByPattern;
 
 	Agent();
 	~Agent();

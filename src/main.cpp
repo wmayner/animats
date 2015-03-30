@@ -3,7 +3,7 @@
 #include <string.h>
 #include <math.h>
 #include <time.h>
-// For getpid function
+// For `getpid` function
 #include <unistd.h>
 
 #include <vector>
@@ -23,8 +23,8 @@ using namespace std;
 double perSiteMutationRate = 0.005;
 int update = 0;
 int repeats = 1;
-int maxAgent = 100;
-int totalGenerations = 32;
+int numAgents = 100;
+int numGenerations = 32;
 char trialName[1000];
 double sensorNoise = 0.0;
 
@@ -47,11 +47,11 @@ int main(int argc, char *argv[]) {
     } else {
         srand(getpid());
     }
-    agent.resize(maxAgent);
+    agent.resize(numAgents);
     game = new Game(argv[1]);
 
     // Larissa
-    game->nowUpdate = floor(totalGenerations / 2);
+    game->nowUpdate = floor(numGenerations / 2);
 
     sensorNoise = atof(argv[6]);
     masterAgent = new Agent;
@@ -64,7 +64,7 @@ int main(int argc, char *argv[]) {
     nextGen.resize(agent.size());
     masterAgent->nrPointingAtMe--;
     cout << "Setup complete." << endl;
-    while (update < totalGenerations) {
+    while (update < numGenerations) {
         for (i = 0; i < agent.size(); i++) {
             agent[i]->fitness = 0.0;
             agent[i]->fitnesses.clear();
@@ -136,15 +136,16 @@ void saveLOD(Agent *agent, FILE *statsFile, FILE *genomeFile) {
         list.push_back(localAgent);
         localAgent = localAgent->ancestor;
     }
-    for (int i = (int)list.size() - 1; i > 0; i--) {
-        agent = list[i];
-        // TODO(wmayner) fix spacing with & below? and spelling of interval?
+    // Start with the most-evolved animat and trace backwards through the line
+    // of descent
+    for (int agentIndex = (int)list.size() - 1; agentIndex > 0; agentIndex--) {
+        agent = list[agentIndex];
         if ((agent->born & LOD_record_interval) == 0) {
             // Larissa: set noise to 0 for analysis
             fprintf(statsFile, "%i   %i  %i", agent->born, agent->correct,
                     agent->incorrect);
-            for (int i = 0; i < agent->differentialCorrects.size(); i++) {
-                fprintf(statsFile, " %i", agent->differentialCorrects[i]);
+            for (int i = 0; i < agent->numCorrectByPattern.size(); i++) {
+                fprintf(statsFile, " %i", agent->numCorrectByPattern[i]);
             }
             fprintf(statsFile, "\n");
             // TODO(wmayner) don't think we need the genome file; apparently

@@ -10,10 +10,9 @@
 #ifndef _globalConst_h_included_
 #define _globalConst_h_included_
 
-#define maxNodes 8
-#define definedCue 0
+#define numNodes 8
 
-#define loopTicks 36
-#define LOD_record_interval 7 //63
+#define numWorldTimesteps 36
+#define LOD_record_interval 7
 
 #endif
