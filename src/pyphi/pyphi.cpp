@@ -1,30 +1,30 @@
 // pyphi.cpp
 
-#include "pyphi.h"
+#include "./pyphi.hpp"
 
 using namespace std;
 
-tPyPhi::~tPyPhi()
+
+pyphi::~pyphi()
 {
     Py_Finalize();
 }
 
-tPyPhi::tPyPhi()
+pyphi::pyphi()
 {
     cout << "INITIALIZING pyphi INSTANCE\n" << endl;
     // Initialize the Python interpreter
     Py_Initialize();
-    if( !Py_IsInitialized() ) {
+    if (!Py_IsInitialized()) {
         printf("Unable to initialize Python interpreter.\n");
     }
-    wcout << "Prefix: " << Py_GetPrefix() << Py_GetExecPrefix() << Py_GetProgramFullPath()<<endl;
-    wcout << "Module Path:" << Py_GetPath()<< endl;
-    wcout << "Version:" << Py_GetVersion()<< "Platform" << Py_GetPlatform()<<endl;
-    wcout << "Compiler:" << Py_GetCompiler()<< "Build Info" << Py_GetBuildInfo()<<endl;
+    wcout << "Prefix: " << Py_GetPrefix() << Py_GetExecPrefix() << Py_GetProgramFullPath() << endl;
+    wcout << "Module Path:" << Py_GetPath() << endl;
+    wcout << "Version:" << Py_GetVersion() << "Platform:" << Py_GetPlatform() << endl;
+    wcout << "Compiler:" << Py_GetCompiler() << "Build Info:" << Py_GetBuildInfo() << endl;
 
     PyRun_SimpleString("import sys");
-    PyRun_SimpleString("sys.path += ['/Users/jagomez/.virtualenvs/matching/lib/python3.4/site-packages']");
-    PyRun_SimpleString("print(sys.path)");
+    PyRun_SimpleString("sys.path.insert(0, " + VIRTUALENV_PATH + ")");
 
     // Modify the path to include the PyPhi installation in the virtualenvs
     // Import the PyPhi Module
@@ -78,7 +78,7 @@ tPyPhi::tPyPhi()
     }
 }
 
-PyObject* tPyPhi::pyphi_network(vector<vector<double> >& c_tpm, vector<long>& current_st, vector<long>& past_state, vector<vector<double> >& conn_matrix)
+PyObject* pyphi::pyphi_network(vector<vector<double> >& c_tpm, vector<long>& current_st, vector<long>& past_state, vector<vector<double> >& conn_matrix)
 {
     PyObject *network;
     vector<double> row;
@@ -114,7 +114,7 @@ PyObject* tPyPhi::pyphi_network(vector<vector<double> >& c_tpm, vector<long>& cu
     return network;
 }
 
-PyObject* tPyPhi::pyphi_subsystem(vector<long>& node_indices, PyObject* network )
+PyObject* pyphi::pyphi_subsystem(vector<long>& node_indices, PyObject* network )
 {
     PyObject *subsystem;
 
@@ -144,7 +144,7 @@ PyObject* tPyPhi::pyphi_subsystem(vector<long>& node_indices, PyObject* network 
     return subsystem;
 }
 
-double tPyPhi::pyphi_bigphi(PyObject* subsystem) {
+double pyphi::pyphi_bigphi(PyObject* subsystem) {
     PyObject *big_phi_result = PyObject_CallFunction(big_phi, "O", subsystem);
     if (big_phi_result==NULL) {
         cout << "ERROR: big_phi_result is NULL." << endl;
@@ -157,7 +157,7 @@ double tPyPhi::pyphi_bigphi(PyObject* subsystem) {
 }
 
 
-double tPyPhi::pyphi_conceptual_information(PyObject* subsystem) {
+double pyphi::pyphi_conceptual_information(PyObject* subsystem) {
     PyObject *conc_inf_result = PyObject_CallFunction(conceptual_information, "O", subsystem);
     if (conc_inf_result==NULL) {
         cout << "ERROR: conc_inf_result is NULL." << endl;
