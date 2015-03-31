@@ -56,8 +56,6 @@ void HMMU::setup(vector<unsigned char> &genome, int start) {
     for (i = 0; i < (1 << _yDim); i++) {
         hmm[i].resize(1 << _xDim);
         for (j = 0; j < (1 << _xDim); j++) {
-            // hmm[i][j] = (genome[(k + j + ((1 << yDim) * i)) % genome.size()]
-            //         & 1) * 255;
             hmm[i][j] = genome[(k + j + ((1 << _xDim) * i)) % genome.size()];
             if (hmm[i][j] == 0)
                 hmm[i][j] = 1;
