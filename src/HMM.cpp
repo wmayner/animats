@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "./HMM.h"
+#include "./HMM.hpp"
 // #define feedbackON
 
 

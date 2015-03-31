@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "Game.h"
+#include "Game.hpp"
 
 // TODO(wmayner) figure out and document cruel black magic voodoo sorcery
 #define KISSRND (                                                        \

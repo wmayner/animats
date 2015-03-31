@@ -12,11 +12,11 @@
 #include <map>
 #include <iostream>
 
-#include "./constants.h"
-#include "./HMM.h"
-#include "./Agent.h"
-#include "./Game.h"
-#include "./analysis.h"
+#include "./constants.hpp"
+#include "./HMM.hpp"
+#include "./Agent.hpp"
+#include "./Game.hpp"
+#include "./analysis.hpp"
 
 #define randDouble ((double)rand() / (double)RAND_MAX)
 

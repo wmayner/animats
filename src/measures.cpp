@@ -4,7 +4,7 @@
 #include <map>
 #include <set>
 
-#include "./measures.h"
+#include "./measures.hpp"
 
 
 double mutualInformation(vector<int> A, vector<int> B) {

@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "./analysis.h"
+#include "./analysis.hpp"
 
 
 void makeFullAnalysis(Game *game, Agent *agent, char *fileLead, double

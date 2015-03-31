@@ -8,9 +8,9 @@
 
 #include <vector>
 
-#include "./constants.h"
-#include "./Agent.h"
-#include "./Game.h"
+#include "./constants.hpp"
+#include "./Agent.hpp"
+#include "./Game.hpp"
 
 using namespace std;
 

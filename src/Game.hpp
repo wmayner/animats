@@ -8,8 +8,8 @@
 
 #include <vector>
 
-#include "./constants.h"
-#include "./Agent.h"
+#include "./constants.hpp"
+#include "./Agent.hpp"
 
 using namespace std;
 

@@ -8,8 +8,8 @@
 
 #include <vector>
 
-#include "./constants.h"
-#include "./HMM.h"
+#include "./constants.hpp"
+#include "./HMM.hpp"
 
 using namespace std;
 

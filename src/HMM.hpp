@@ -10,7 +10,7 @@
 #include <deque>
 #include <iostream>
 
-#include "./constants.h"
+#include "./constants.hpp"
 
 using namespace std;
 
