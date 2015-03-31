@@ -1,7 +1,7 @@
 // HMM.h
 
-#ifndef _SRC_HMM_H_
-#define _SRC_HMM_H_
+#ifndef SRC_HMM_H_
+#define SRC_HMM_H_
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -34,4 +34,4 @@ class HMMU{
     void show(void);
 };
 
-#endif  // _SRC_HMM_H_
+#endif  // SRC_HMM_H_
