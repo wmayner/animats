@@ -10,9 +10,6 @@
 
 #include "./constants.h"
 #include "./HMM.h"
-#include "./ANN.h"
-
-//#define useANN
 
 using namespace std;
 
@@ -30,9 +27,6 @@ public:
 	vector<HMMU*> hmmus;
 	vector<unsigned char> genome;
 	vector<tDot> dots;
-#ifdef useANN
-	ANN *ANN;
-#endif
 
 	Agent *ancestor;
 	unsigned int nrPointingAtMe;

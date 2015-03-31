@@ -20,9 +20,6 @@ Agent::Agent(){
 	totalSteps=0;
 	retired=false;
 	food=0;
-#ifdef useANN
-	ANN=new ANN;
-#endif
 }
 
 Agent::~Agent(){
@@ -33,9 +30,6 @@ Agent::~Agent(){
 		if(ancestor->nrPointingAtMe==0)
 			delete ancestor;
 	}
-#ifdef useANN
-	delete ANN;
-#endif
 }
 
 void Agent::setupRandomAgent(int nucleotides){
@@ -45,9 +39,6 @@ void Agent::setupRandomAgent(int nucleotides){
 		genome[i]=127;//rand()&255;
 	//ampUpStartCodons();   //Larissa: To initially boost evolution uncomment
 	setupPhenotype();
-#ifdef useANN
-	ANN->setup();
-#endif
 }
 void Agent::loadAgent(char* filename){
 	FILE *f=fopen(filename,"r+t");
@@ -61,10 +52,6 @@ void Agent::loadAgent(char* filename){
 	setupPhenotype();
 }
 void Agent::loadAgentWithTrailer(char* filename){
-#ifdef useANN
-	ANN=new ANN;
-	ANN->load(filename);
-#else
 	FILE *f=fopen(filename,"r+t");
 	int i;
 	genome.clear();
@@ -74,7 +61,6 @@ void Agent::loadAgentWithTrailer(char* filename){
 		genome.push_back((unsigned char)(i&255));
 	}
 	setupPhenotype();
-#endif
 }
 
 
@@ -124,9 +110,6 @@ void Agent::inherit(Agent *from,double mutationRate,int theTime){
 	}
 	setupPhenotype();
 	fitness=0.0;
-#ifdef useANN
-	ANN->inherit(ancestor->ANN,mutationRate);
-#endif
 }
 void Agent::setupPhenotype(void){
 	int i;
@@ -163,15 +146,9 @@ unsigned char * Agent::getStatesPointer(void){
 void Agent::resetBrain(void){
 	for(int i=0;i<numNodes;i++)
 		states[i]=0;
-#ifdef useANN
-	ANN->resetBrain();
-#endif
 }
 
 void Agent::updateStates(void){
-#ifdef useANN
-	ANN->update(&states[0]);
-#else
 	int i;
 	for(i=0;i<hmmus.size();i++)
 		hmmus[i]->update(&states[0],&newStates[0]);
@@ -179,7 +156,6 @@ void Agent::updateStates(void){
 		states[i]=newStates[i];
 		newStates[i]=0;
 	}
-#endif
 	totalSteps++;
 }
 
@@ -234,19 +210,12 @@ void Agent::saveFromLMRCAtoNULL(FILE *statsFile,FILE *genomeFile){
 void Agent::saveLOD(FILE *statsFile,FILE *genomeFile){
 	if(ancestor!=NULL)
 		ancestor->saveLOD(statsFile,genomeFile);
-#ifdef useANN
-	fprintf(genomeFile,"%i	",ID);
-	fprintf(statsFile,"%i	%i	%i	%f	%i	%f	%i	%i\n",ID,born,(int)genome.size(),fitness,bestSteps,(float)totalSteps/(float)nrOfOffspring,correct,incorrect);
-	ANN->saveLOD(genomeFile);
-#else
     fprintf(statsFile,"%i	%i	%f	%i	%f	%i	%i\n",ID,born,fitness,bestSteps,(float)totalSteps/(float)nrOfOffspring,correct,incorrect);
     if(!retired){
         for(int i=0;i<genome.size();i++)
             fprintf(genomeFile,"%i  ",genome[i]);
         fprintf(genomeFile,"\n");
     }
-#endif
-
 }
 
 void Agent::showPhenotype(void){
