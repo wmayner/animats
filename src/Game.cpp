@@ -118,7 +118,7 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                     agent->states[6] = 0; agent->states[7] = 0;
 
                     past_state = 0;
-                    for (int n = 0; n < 8; n++) {
+                    for (int n = 0; n < NUM_NODES; n++) {
                         // Set the nth bit to the nth node's state
                         past_state |= (agent->states[n] & 1) << n;
                     }
@@ -127,7 +127,7 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                     agent->updateStates();
 
                     current_state = 0;
-                    for (int n = 0; n < 8; n++) {
+                    for (int n = 0; n < NUM_NODES; n++) {
                         // Set the nth bit to the nth node's state
                         current_state |= (agent->states[n] & 1) << n;
                     }
