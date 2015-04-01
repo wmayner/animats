@@ -87,7 +87,7 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
         // Directions (left/right)
         for (direction = -1; direction < 2; direction += 2) {
             // Agent starting position
-            for (agentPosition = 0; agentPosition < 16; agentPosition++) {
+            for (agentPosition = 0; agentPosition < WORLD_WIDTH; agentPosition++) {
                 // Larissa: Change environment after 30,000 Gen, if patterns is
                 // 1 7 15 3 it changes from 2 blocks with 1 7 to 4 blocks with
                 // 1 7 15 3
@@ -102,12 +102,12 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                 blockPos = 0;
 
                 // World loop
-                for (timestep = 0; timestep < NUM_WORLD_TIMESTEPS; timestep++) {
+                for (timestep = 0; timestep < WORLD_HEIGHT; timestep++) {
                     // AH: Sensors have no noise in them now
                     // Activate sensors if block is in line of sight
                     agent->states[0] = (world >> agentPosition) & 1;
-                    agent->states[1] = (world >> ((agentPosition + 2) & 15)) &
-                        1;
+                    agent->states[1] = (world >> ((agentPosition + 2) &
+                                (WORLD_WIDTH - 1))) & 1;
 
                     // TODO(wmayner) parameterize changing sensors mid-evolution
                     // Larissa: Set to 0 to evolve agents with just one sensor
@@ -157,30 +157,30 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                         case 1:
                             // Move right
                             // TODO(wmayner) replace with constant
-                            agentPosition = (agentPosition + 1) & 15;
+                            agentPosition = (agentPosition + 1) & (WORLD_WIDTH - 1);
                             break;
                         // Right motor on
                         case 2:
                             // Move left
                             // TODO(wmayner) replace with constant
-                            agentPosition = (agentPosition - 1) & 15;
+                            agentPosition = (agentPosition - 1) & (WORLD_WIDTH - 1);
                             break;
                     }
 
                     // Move the block
                     if (direction == -1) {
                         // Left
-                        world = ((world >> 1) & 65535) + ((world & 1) << 15);
+                        world = ((world >> 1) & 65535) + ((world & 1) << (WORLD_WIDTH - 1));
                     } else {
                         // Right
-                        world = ((world << 1) & 65535) + ((world >> 15) & 1);
+                        world = ((world << 1) & 65535) + ((world >> (WORLD_WIDTH - 1)) & 1);
                     }
                 }
 
                 // Check for hit
                 hit = false;
                 for (agentCell = 0; agentCell < 3; agentCell++) {
-                    if (((world >> ((agentPosition + agentCell) & 15)) & 1)
+                    if (((world >> ((agentPosition + agentCell) & (WORLD_WIDTH - 1))) & 1)
                             == 1) {
                         hit = true;
                     }

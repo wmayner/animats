@@ -59,7 +59,7 @@ double predictiveI(vector<int> A) {
     vector<int> S, I;
     S.clear(); I.clear();
     for (int i = 0; i < A.size(); i++) {
-        S.push_back((A[i] >> 12) & 15);
+        S.push_back((A[i] >> 12) & (WORLD_WIDTH - 1));
         I.push_back(A[i] & 3);
     }
     return mutualInformation(S, I);
@@ -69,7 +69,7 @@ double nonPredictiveI(vector<int> A) {
     vector<int> S, I;
     S.clear(); I.clear();
     for (int i = 0; i < A.size(); i++) {
-        S.push_back((A[i] >> 12) & 15);
+        S.push_back((A[i] >> 12) & (WORLD_WIDTH - 1));
         I.push_back(A[i] & 3);
     }
     return entropy(I) - mutualInformation(S, I);
@@ -79,7 +79,7 @@ double predictNextInput(vector<int> A) {
     vector<int> S, I;
     S.clear(); I.clear();
     for (int i = 0; i < A.size(); i++) {
-        S.push_back((A[i] >> 12) & 15);
+        S.push_back((A[i] >> 12) & (WORLD_WIDTH - 1));
         I.push_back(A[i] & 3);
     }
     S.erase(S.begin());

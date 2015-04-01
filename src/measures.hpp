@@ -11,6 +11,8 @@
 #include <map>
 #include <set>
 
+#include "./constants.hpp"
+
 using namespace std;
 
 double mutualInformation(vector<int> A, vector<int> B);
