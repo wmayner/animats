@@ -102,11 +102,12 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                 blockPos = 0;
 
                 // World loop
-                for (timestep = 0; timestep < numWorldTimesteps; timestep++) {
+                for (timestep = 0; timestep < NUM_WORLD_TIMESTEPS; timestep++) {
                     // AH: Sensors have no noise in them now
+                    // Activate sensors if block is in line of sight
                     agent->states[0] = (world >> agentPosition) & 1;
-                    agent->states[1] = (world >> ((agentPosition + 2) & 15))
-                        & 1;
+                    agent->states[1] = (world >> ((agentPosition + 2) & 15)) &
+                        1;
 
                     // TODO(wmayner) parameterize changing sensors mid-evolution
                     // Larissa: Set to 0 to evolve agents with just one sensor
@@ -189,19 +190,19 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                 if ((patternIndex & 1) == 0) {
                     if (hit) {
                         agent->correct++;
-                        agent->fitness *= fitnessMultiplier;
+                        agent->fitness *= FITNESS_MULTIPLIER;
                         agent->numCorrectByPattern[patternIndex]++;
                     } else {
-                        agent->fitness /= fitnessMultiplier;
+                        agent->fitness /= FITNESS_MULTIPLIER;
                         agent->incorrect++;
                     }
                 } else {
                     if (hit) {
                         agent->incorrect++;
-                        agent->fitness /= fitnessMultiplier;
+                        agent->fitness /= FITNESS_MULTIPLIER;
                     } else {
                         agent->correct++;
-                        agent->fitness *= fitnessMultiplier;
+                        agent->fitness *= FITNESS_MULTIPLIER;
                         agent->numCorrectByPattern[patternIndex]++;
                     }
                 }

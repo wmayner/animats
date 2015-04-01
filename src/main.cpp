@@ -143,7 +143,7 @@ void saveLOD(Agent *agent, FILE *statsFile, FILE *genomeFile) {
     // of descent
     for (int agentIndex = (int)list.size() - 1; agentIndex > 0; agentIndex--) {
         agent = list[agentIndex];
-        if ((agent->born & LOD_record_interval) == 0) {
+        if ((agent->born & LOD_RECORD_INTERVAL) == 0) {
             // Larissa: set noise to 0 for analysis
             fprintf(statsFile, "%i   %i  %i", agent->born, agent->correct,
                     agent->incorrect);

@@ -29,8 +29,8 @@ void HMMU::setup(vector<unsigned char> &genome, int start) {
 
     _xDim = 1 + (genome[(k++) % genome.size()] & 3);
     _yDim = 1 + (genome[(k++) % genome.size()] & 3);
-    posFBNode = genome[(k++) % genome.size()] & (numNodes - 1);
-    negFBNode = genome[(k++) % genome.size()] & (numNodes - 1);
+    posFBNode = genome[(k++) % genome.size()] & (NUM_NODES - 1);
+    negFBNode = genome[(k++) % genome.size()] & (NUM_NODES - 1);
     nrPos = genome[(k++) % genome.size()] & 3;
     nrNeg = genome[(k++) % genome.size()] & 3;
     ins.resize(_yDim);
@@ -38,9 +38,9 @@ void HMMU::setup(vector<unsigned char> &genome, int start) {
     posLevelOfFB.resize(nrPos);
     negLevelOfFB.resize(nrNeg);
     for (i = 0; i < _yDim; i++)
-        ins[i] = genome[(k + i) % genome.size()] & (numNodes - 1);
+        ins[i] = genome[(k + i) % genome.size()] & (NUM_NODES - 1);
     for (i = 0; i < _xDim; i++)
-        outs[i] = genome[(k + 4 + i) % genome.size()] & (numNodes - 1);
+        outs[i] = genome[(k + 4 + i) % genome.size()] & (NUM_NODES - 1);
     for (i = 0; i < nrPos; i++)
         posLevelOfFB[i] = (int)(1 + genome[(k + 8 + i) % genome.size()]);
     for (i = 0; i < nrNeg; i++)
@@ -74,8 +74,8 @@ void HMMU::setupQuick(vector<unsigned char> &genome, int start) {
 
     _xDim = 1 + (genome[(k++) % genome.size()] & 3);
     _yDim = 1 + (genome[(k++) % genome.size()] & 3);
-    posFBNode = genome[(k++) % genome.size()] & (numNodes - 1);
-    negFBNode = genome[(k++) % genome.size()] & (numNodes - 1);
+    posFBNode = genome[(k++) % genome.size()] & (NUM_NODES - 1);
+    negFBNode = genome[(k++) % genome.size()] & (NUM_NODES - 1);
     nrPos = genome[(k++) % genome.size()] & 3;
     nrNeg = genome[(k++) % genome.size()] & 3;
     ins.resize(_yDim);
@@ -83,9 +83,9 @@ void HMMU::setupQuick(vector<unsigned char> &genome, int start) {
     posLevelOfFB.resize(nrPos);
     negLevelOfFB.resize(nrNeg);
     for (i = 0; i < _yDim; i++)
-        ins[i] = genome[(k + i) % genome.size()] & (numNodes - 1);
+        ins[i] = genome[(k + i) % genome.size()] & (NUM_NODES - 1);
     for (i = 0; i < _xDim; i++)
-        outs[i] = genome[(k + 4 + i) % genome.size()] & (numNodes - 1);
+        outs[i] = genome[(k + 4 + i) % genome.size()] & (NUM_NODES - 1);
     for (i = 0; i < nrPos; i++)
         posLevelOfFB[i] = (int)(1 + genome[(k + 8 + i) % genome.size()]);
     for (i = 0; i < nrNeg; i++)

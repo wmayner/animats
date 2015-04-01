@@ -30,7 +30,7 @@ public:
 
 	Agent *ancestor;
 	unsigned int nrPointingAtMe;
-	unsigned char states[numNodes], newStates[numNodes];
+	unsigned char states[NUM_NODES], newStates[NUM_NODES];
 	double fitness, convFitness;
 	vector<double> fitnesses;
 	int food;

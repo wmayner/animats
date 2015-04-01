@@ -7,7 +7,7 @@ Agent::Agent(){
 	int i;
 	nrPointingAtMe=1;
 	ancestor=NULL;
-	for(i=0;i<numNodes;i++){
+	for(i=0;i<NUM_NODES;i++){
 		states[i]=0;
 		newStates[i]=0;
 	}
@@ -144,7 +144,7 @@ unsigned char * Agent::getStatesPointer(void){
 }
 
 void Agent::resetBrain(void){
-	for(int i=0;i<numNodes;i++)
+	for(int i=0;i<NUM_NODES;i++)
 		states[i]=0;
 }
 
@@ -152,7 +152,7 @@ void Agent::updateStates(void){
 	int i;
 	for(i=0;i<hmmus.size();i++)
 		hmmus[i]->update(&states[0],&newStates[0]);
-	for(i=0;i<numNodes;i++){
+	for(i=0;i<NUM_NODES;i++){
 		states[i]=newStates[i];
 		newStates[i]=0;
 	}
@@ -160,7 +160,7 @@ void Agent::updateStates(void){
 }
 
 void Agent::showBrain(void){
-	for(int i=0;i<numNodes;i++)
+	for(int i=0;i<NUM_NODES;i++)
 		cout<<(int)states[i];
 	cout<<endl;
 }
@@ -315,7 +315,7 @@ void Agent::saveLogicTableSingleAnimat(FILE *f){
         // update States deterministically, without using random number generator
         for(k=0;k<hmmus.size();k++)
             hmmus[k]->deterministicUpdate(&states[0],&newStates[0]);
-        for(k=0;k<numNodes;k++){
+        for(k=0;k<NUM_NODES;k++){
             states[k]=newStates[k];
             newStates[k]=0;
         }
