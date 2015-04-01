@@ -5,166 +5,145 @@
 using namespace std;
 
 
-pyphi::~pyphi()
-{
+PyPhi::~PyPhi() {
     Py_Finalize();
 }
 
-pyphi::pyphi()
-{
-    cout << "INITIALIZING pyphi INSTANCE\n" << endl;
+PyPhi::PyPhi() {
+    cout << "Initializing PyPhi...\n" << endl;
+
     // Initialize the Python interpreter
     Py_Initialize();
     if (!Py_IsInitialized()) {
-        printf("Unable to initialize Python interpreter.\n");
+        printf("ERROR: Unable to initialize Python interpreter.\n");
+    } else {
+        printf("Python interpreter initialized.\n");
     }
     wcout << "Prefix: " << Py_GetPrefix() << Py_GetExecPrefix() << Py_GetProgramFullPath() << endl;
     wcout << "Module Path:" << Py_GetPath() << endl;
     wcout << "Version:" << Py_GetVersion() << "Platform:" << Py_GetPlatform() << endl;
     wcout << "Compiler:" << Py_GetCompiler() << "Build Info:" << Py_GetBuildInfo() << endl;
 
+    // Add the virtualenv to the Python path
     PyRun_SimpleString("import sys");
     PyRun_SimpleString("sys.path.insert(0, " + VIRTUALENV_PATH + ")");
 
-    // Modify the path to include the PyPhi installation in the virtualenvs
-    // Import the PyPhi Module
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    pyphi_m = PyImport_ImportModule("pyphi");
-    if (pyphi_m==NULL)
+    // Import PyPhi
+    pyphi = PyImport_ImportModule("pyphi");
+    if (pyphi == NULL)
     {
         PyErr_Print();
-        cout << "ERROR: Could not import pyphi." << endl;
+        cout << "ERROR: Can't import PyPhi." << endl;
     }
-    // Set PyPhi options
-    // ~~~~~~~~~~~~~~~~~
-    // Get references to the PyPhi functions we'll use
-    // ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    // Get reference to Network class.
+
+    // Get references to the PyPhi functions we want to expose
+
     network_constructor = PyObject_GetAttrString(pyphi_m, "Network");
     if (network_constructor == NULL) {
-        // Print the last Python exception
         PyErr_Print();
         Py_DECREF(network_constructor);
-        cout << "ERROR: Couldn 't get reference to pyphi.Network." <<endl;
+        cout << "ERROR: Can't get reference to pyphi.Network class." << endl;
     }
-    // Get reference to Subsystem class.
-    subsystem_constructor = PyObject_GetAttrString(pyphi_m, "Subsystem"); //class pyphi.subsystem.Subsystem
+
+    subsystem_constructor = PyObject_GetAttrString(pyphi_m, "Subsystem");
     if (subsystem_constructor == NULL) {
-        // Print the last Python exception
         PyErr_Print();
         Py_DECREF(subsystem_constructor);
-        cout << "ERROR: Couldn't get reference to pyphi.Subsystem." <<endl;
+        cout << "ERROR: Can't get reference to pyphi.Subsystem class." << endl;
     }
-    // Get reference to the big_phi function.
+
     compute = PyImport_ImportModule("pyphi.compute");
     if (compute == NULL) {
-        cout << "ERROR: Could not import pyphi.compute." << endl;
+        cout << "ERROR: Can't import the pyphi.compute module." << endl;
     }
-    big_phi = PyObject_GetAttrString(compute, "big_phi");
+
+    py_big_phi = PyObject_GetAttrString(compute, "big_phi");
     Py_DECREF(compute);
-    // Check we get the object of the class
-    if (big_phi == NULL) {
-        cout << "ERROR: Couldn't get reference to pyphi.compute.big_phi." <<endl;
+    if (py_big_phi == NULL) {
+        cout << "ERROR: Can't get reference to pyphi.compute.big_phi." << endl;
         PyErr_Print();
-        Py_DECREF(big_phi);
+        Py_DECREF(py_big_phi);
     }
-    conceptual_information = PyObject_GetAttrString(compute, "conceptual_information");
-    Py_DECREF(compute);
-    // Check we get the object of the class
-    if (conceptual_information == NULL) {
-        cout << "ERROR: Couldn't get reference to pyphi.compute.conceptual_information." <<endl;
+
+    py_conceptual_information = PyObject_GetAttrString(compute, "conceptual_information");
+    Py_DECREF(py_compute);
+    if (py_conceptual_information == NULL) {
+        cout << "ERROR: Can't get reference to the pyphi.compute.conceptual_information function." << endl;
         PyErr_Print();
-        Py_DECREF(conceptual_information);
+        Py_DECREF(py_conceptual_information);
     }
 }
 
-PyObject* pyphi::pyphi_network(vector<vector<double> >& c_tpm, vector<long>& current_st, vector<long>& past_state, vector<vector<double> >& conn_matrix)
-{
+PyObject* PyPhi::network(vector< vector<double> >& c_tpm, vector<long>&
+        current_state, vector<long>& past_state, vector< vector<double> >&
+        c_cm) {
     PyObject *network;
-    vector<double> row;
-    vector<vector<double> > prob_ctpm;
-    PyObject* py_tpm = PyInterface::vec_of_vecs_to_list_of_lists(c_tpm);
-    PyObject* py_cm = PyInterface::vec_of_vecs_to_list_of_lists(conn_matrix);
-    PyObject *network_args = Py_BuildValue("O (i,i,i,i,i,i,i,i) (i,i,i,i,i,i,i,i) O",
-        py_tpm,
+    PyObject* py_tpm = convert::vec_of_vecs_to_list_of_lists(c_tpm);
+    PyObject* py_cm = convert::vec_of_vecs_to_list_of_lists(c_cm);
+    // TODO(wmayner) parameterize number of nodes
+    PyObject *network_args = Py_BuildValue("O (i,i,i,i,i,i,i,i) (i,i,i,i,i,i,i,i) O", py_tpm,
         current_st[0], current_st[1], current_st[2],current_st[3], current_st[4], current_st[5],current_st[6], current_st[7],
         past_state[0], past_state[1], past_state[2],past_state[3], past_state[4], past_state[5],past_state[6], past_state[7],
         py_cm);
-    if (network_args==NULL) {
-        // Print the last Python exception
+    if (network_args == NULL) {
         PyErr_Print();
         Py_DECREF(network_args);
-        cout << "ERROR: Cannot create network arguments." <<endl;
+        cout << "ERROR: Can't create pyphi.Network arguments." << endl;
     }
     network = PyObject_CallObject(network_constructor, network_args);
     Py_DECREF(network_args);
     Py_DECREF(py_tpm);
     Py_DECREF(py_cm);
-    // Check that the creation of the Network succeeded
-    if (network==NULL) {
-        // Print the last Python exception
+    if (network == NULL) {
         PyErr_Print();
         Py_DECREF(network);
-        cout << "ERROR: Cannot create network instance." <<endl;
+        cout << "ERROR: Can't create pyphi.Network instance." << endl;
     }
-    row.clear();
-    //row.shrink_to_fit();
-    prob_ctpm.clear();
-    //prob_ctpm.shrink_to_fit();
     return network;
 }
 
-PyObject* pyphi::pyphi_subsystem(vector<long>& node_indices, PyObject* network )
-{
+PyObject* PyPhi::subsystem(vector<long>& node_indices, PyObject* network) {
     PyObject *subsystem;
 
-    // node_indices has variable size, optimize this, horrendus
-    PyObject* py_node_indices = PyInterface::vector_to_list_long(node_indices);
-    PyObject* subsystem_args = Py_BuildValue("O O",
-                                   py_node_indices,
-                                   network);
-    if (subsystem_args==NULL) {
-        // Print the last Python exception
+    PyObject* py_node_indices = convert::vector_to_list_long(node_indices);
+    PyObject* subsystem_args = Py_BuildValue("O O", py_node_indices, network);
+    if (subsystem_args == NULL) {
         PyErr_Print();
         Py_DECREF(subsystem_args);
-        cout << "ERROR: can not build argument list for object instance subsystem." <<endl;
+        cout << "ERROR: Can't build pyphi.Subsystem arguments." <<endl;
     }
-    // Create a new instance of the class subsystem by calling the class with the arguments
     subsystem = PyObject_CallObject(subsystem_constructor, subsystem_args);
     Py_DECREF(py_node_indices);
     Py_DECREF(subsystem_args);
-    if (subsystem==NULL) {
-        // Print the last Python exception
+    if (subsystem == NULL) {
         PyErr_Print();
         Py_DECREF(subsystem);
-        cout << "ERROR: Couldn't create Subsystem object." <<endl;
+        cout << "ERROR: Can't create pyphi.Subsystem instance." << endl;
     }
-    // Last, call the method big_phi of the module pyphi.compute, passing as an argument reference
-    // to "myobject" which is a reference to a susbsystem object
     return subsystem;
 }
 
-double pyphi::pyphi_bigphi(PyObject* subsystem) {
-    PyObject *big_phi_result = PyObject_CallFunction(big_phi, "O", subsystem);
-    if (big_phi_result==NULL) {
-        cout << "ERROR: big_phi_result is NULL." << endl;
+double PyPhi::big_phi(PyObject* subsystem) {
+    PyObject *py_result = PyObject_CallFunction(py_big_phi, "O", subsystem);
+    if (py_result == NULL) {
+        cout << "ERROR: big_phi returned NULL." << endl;
         PyErr_Print();
-        Py_DECREF(big_phi_result);
+        Py_DECREF(py_result);
     }
-    double ccbigphi = PyFloat_AsDouble(big_phi_result);
-    Py_DECREF(big_phi_result);
-    return ccbigphi;
+    double c_result = PyFloat_AsDouble(py_result);
+    Py_DECREF(py_result);
+    return c_result;
 }
 
-
-double pyphi::pyphi_conceptual_information(PyObject* subsystem) {
-    PyObject *conc_inf_result = PyObject_CallFunction(conceptual_information, "O", subsystem);
-    if (conc_inf_result==NULL) {
-        cout << "ERROR: conc_inf_result is NULL." << endl;
+double PyPhi::conceptual_information(PyObject* subsystem) {
+    PyObject *py_result = PyObject_CallFunction(py_conceptual_information, "O",
+            subsystem);
+    if (py_result == NULL) {
+        cout << "ERROR: conceptual_information returned NULL." << endl;
         PyErr_Print();
-        Py_DECREF(conc_inf_result);
+        Py_DECREF(py_result);
     }
-    double conc_in = PyFloat_AsDouble(conc_inf_result);
-    Py_DECREF(conc_inf_result);
-    return conc_in;
+    double c_result = PyFloat_AsDouble(py_result);
+    Py_DECREF(py_result);
+    return c_result;
 }

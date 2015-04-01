@@ -22,25 +22,25 @@
 #include "./tHMM.h"
 #include "./PyInterface.h"
 
-class tPyPhi : public PyInterface {
-    public:
-        // Declare the default constructor
-        tPyPhi();
-        // Declare the default destructor
-        ~tPyPhi();
 
-        PyObject* pyphi_network( vector<vector<double> >& c_tpm, vector<long>& current_st, vector<long>& past_state,vector<vector<double> >& conn_mat);  // create network constructor from tpm and current and past state
-        PyObject* pyphi_subsystem(vector<long>& node_indices,  PyObject* network ) ; //
-        double pyphi_bigphi(PyObject* subsystem);
-        double pyphi_conceptual_information(PyObject* subsystem);
-    public:
-        PyObject *network_constructor;
-        PyObject *subsystem_constructor;
-        PyObject *compute;
-        PyObject *big_phi;
-        PyObject *conceptual_information;
-        // Reference to the imported PyPhi module
-        PyObject* pyphi_m;
+class PyPhi {
+    PyObject* pyphi;
+    PyObject* network_constructor;
+    PyObject* subsystem_constructor;
+    PyObject* compute;
+    PyObject* py_big_phi;
+    PyObject* py_conceptual_information;
+ public:
+    PyPhi();
+    ~PyPhi();
+
+    PyObject* network(vector< vector<double> >& c_tpm, vector<long>&
+            current_state, vector<long>& past_state, vector< vector<double> >&
+            c_cm);
+    PyObject* subsystem(vector<long>& node_indices, PyObject* network);
+
+    double big_phi(PyObject* subsystem);
+    double conceptual_information(PyObject* subsystem);
 };
 
 #endif  // SRC_PYPHI_H_
