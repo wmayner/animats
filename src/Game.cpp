@@ -1,6 +1,7 @@
 // Game.cpp
 
 #include <vector>
+#include <bitset>
 
 #include "Game.hpp"
 
@@ -24,8 +25,9 @@ Game::Game(char* filename) {
     int i;
     patterns.clear();
     while (!feof(f)) {
+        // TODO(wmayner) use CSV format
         fscanf(f, "%i  ", &i);
-        patterns.push_back(i & 65535);
+        patterns.push_back(bitset<WORLD_WIDTH>(i));
     }
     fclose(f);
 }
@@ -55,11 +57,22 @@ void Game::applyNoise(Agent *agent, double sensorNoise) {
     }
 }
 
+/**
+ * Executes a game, updates the agent's fitness accordingly, and returns a
+ * vector of the agent's state transitions over the course of the game.
+ */
 vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
         repeat) {
-    int world, agentPosition, blockPos, past_state, current_state;
-    int patternIndex, direction, timestep, agentCell;
+    bitset<WORLD_WIDTH> world, old_world;
+
+    // TODO(wmayner) parametrize agent size
+    // This holds the position of each cell in the agents body
+    vector<int> agentCells;
+
+    int agentPosition, blockPos, past_state, current_state;
+    int patternIndex, direction, timestep;
     int action;
+
     // This holds the state transitions over the agent's lifetime
     vector< vector<int> > stateTransitions;
     stateTransitions.clear();
@@ -88,6 +101,12 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
         for (direction = -1; direction < 2; direction += 2) {
             // Agent starting position
             for (agentPosition = 0; agentPosition < WORLD_WIDTH; agentPosition++) {
+                agentCells.clear();
+                agentCells.resize(3);
+                for (int i = 0; i < 3; i++) {
+                    // TODO(wmayner) make (WORLD_WIDTH -1) modulus a constant?
+                    agentCells.push_back((agentPosition + i) % (WORLD_WIDTH - 1));
+                }
                 // Larissa: Change environment after 30,000 Gen, if patterns is
                 // 1 7 15 3 it changes from 2 blocks with 1 7 to 4 blocks with
                 // 1 7 15 3
@@ -103,18 +122,19 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
 
                 // World loop
                 for (timestep = 0; timestep < WORLD_HEIGHT; timestep++) {
-                    // AH: Sensors have no noise in them now
                     // Activate sensors if block is in line of sight
-                    agent->states[0] = (world >> agentPosition) & 1;
-                    agent->states[1] = (world >> ((agentPosition + 2) &
-                                (WORLD_WIDTH - 1))) & 1;
+                    // TODO(wmayner) parametrize sensor location on agent body
+                    agent->states[0] = world[agentCells[0]];
+                    agent->states[1] = world[agentCells[2]];
 
                     // TODO(wmayner) parameterize changing sensors mid-evolution
                     // Larissa: Set to 0 to evolve agents with just one sensor
 
-                    // AH: Apply noise does apply noise to them now
                     applyNoise(agent, sensorNoise);
-                    // Set motors to 0 to prevent reading from them
+
+                    // Set motors to 0 to prevent them from influencing next
+                    // animat state
+                    // TODO(wmayner) parametrize motor node indices
                     agent->states[6] = 0; agent->states[7] = 0;
 
                     past_state = 0;
@@ -139,6 +159,8 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                     // if (agent->born < nowUpdate) {
                     //     agent->states[7] = 0;
                     // }
+                    // TODO(wmayner) switch motors and cases to be less
+                    // confusing
                     action = agent->states[6] + (agent->states[7] << 1);
 
                     // Move agent
@@ -156,37 +178,41 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                         // Left motor on
                         case 1:
                             // Move right
-                            // TODO(wmayner) replace with constant
-                            agentPosition = (agentPosition + 1) & (WORLD_WIDTH - 1);
+                            agentPosition = (agentPosition + 1) %
+                                (WORLD_WIDTH - 1);
                             break;
                         // Right motor on
                         case 2:
                             // Move left
-                            // TODO(wmayner) replace with constant
-                            agentPosition = (agentPosition - 1) & (WORLD_WIDTH - 1);
+                            agentPosition = (agentPosition - 1) %
+                                (WORLD_WIDTH - 1);
                             break;
                     }
 
+                    old_world = world;
                     // Move the block
                     if (direction == -1) {
                         // Left
-                        world = ((world >> 1) & 65535) + ((world & 1) << (WORLD_WIDTH - 1));
+                        world = old_world >> 1;
+                        world[WORLD_WIDTH - 1] = old_world[0];
                     } else {
                         // Right
-                        world = ((world << 1) & 65535) + ((world >> (WORLD_WIDTH - 1)) & 1);
+                        world = old_world << 1;
+                        world[0] = old_world[WORLD_WIDTH - 1];
                     }
                 }
 
                 // Check for hit
                 hit = false;
-                for (agentCell = 0; agentCell < 3; agentCell++) {
-                    if (((world >> ((agentPosition + agentCell) & (WORLD_WIDTH - 1))) & 1)
-                            == 1) {
+                for (int i = 0; i < agentCells.size(); i++) {
+                    if (world[agentCells[i]] == 1) {
                         hit = true;
                     }
                 }
 
                 // Update fitness
+                // TODO(wmayner) Make the alternating catch/avoid stuff
+                // explicit and read it from the file
                 if ((patternIndex & 1) == 0) {
                     if (hit) {
                         agent->correct++;

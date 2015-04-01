@@ -15,7 +15,7 @@ using namespace std;
 
 class Game {
  public:
-    vector<int> patterns;
+    vector< bitset<WORLD_WIDTH> > patterns;
     vector< vector<int> > executeGame(Agent* agent, double sensorNoise, int
             repeat = 0);
     explicit Game(char* filename);
