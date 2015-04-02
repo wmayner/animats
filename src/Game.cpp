@@ -68,8 +68,7 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
     // TODO(wmayner) parametrize agent size
     // This holds the position of each cell in the agents body
     vector<int> agentCells;
-
-    int agentPosition, blockPos, past_state, current_state;
+    int initAgentPos, agentPos, blockPos, past_state, current_state;
     int patternIndex, direction, timestep;
     int action;
 
@@ -100,12 +99,15 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
         // Directions (left/right)
         for (direction = -1; direction < 2; direction += 2) {
             // Agent starting position
-            for (agentPosition = 0; agentPosition < WORLD_WIDTH; agentPosition++) {
+            for (initAgentPos = 0; initAgentPos < WORLD_WIDTH; initAgentPos++)
+            {
+                agentPos = initAgentPos;
+
                 agentCells.clear();
                 agentCells.resize(3);
                 for (int i = 0; i < 3; i++) {
                     // TODO(wmayner) make (WORLD_WIDTH -1) modulus a constant?
-                    agentCells.push_back((agentPosition + i) % (WORLD_WIDTH - 1));
+                    agentCells.push_back((agentPos + i) % (WORLD_WIDTH - 1));
                 }
                 // Larissa: Change environment after 30,000 Gen, if patterns is
                 // 1 7 15 3 it changes from 2 blocks with 1 7 to 4 blocks with
@@ -178,14 +180,12 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                         // Left motor on
                         case 1:
                             // Move right
-                            agentPosition = (agentPosition + 1) %
-                                (WORLD_WIDTH - 1);
+                            agentPos = (agentPos + 1) % (WORLD_WIDTH - 1);
                             break;
                         // Right motor on
                         case 2:
                             // Move left
-                            agentPosition = (agentPosition - 1) %
-                                (WORLD_WIDTH - 1);
+                            agentPos = (agentPos - 1) % (WORLD_WIDTH - 1);
                             break;
                     }
 
