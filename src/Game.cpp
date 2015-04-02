@@ -77,9 +77,6 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
     vector<int> worldTransform;
     for (int i = 0; i < WORLD_WIDTH; i++) worldTransform.push_back(i);
 
-    // TODO(wmayner) parametrize agent size
-    // This holds the position of each cell in the agents body
-    vector<int> agentCells;
     int initAgentPos, agentPos, blockPos, past_state, current_state;
     int patternIndex, direction, timestep;
     int action;
@@ -114,13 +111,9 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
             for (initAgentPos = 0; initAgentPos < WORLD_WIDTH; initAgentPos++)
             {
                 agentPos = initAgentPos;
+                // Block always starts at top-left
+                blockPos = 0;
 
-                agentCells.clear();
-                agentCells.resize(3);
-                for (int i = 0; i < 3; i++) {
-                    // TODO(wmayner) make (WORLD_WIDTH -1) modulus a constant?
-                    agentCells.push_back((agentPos + i) % (WORLD_WIDTH - 1));
-                }
                 // Larissa: Change environment after 30,000 Gen, if patterns is
                 // 1 7 15 3 it changes from 2 blocks with 1 7 to 4 blocks with
                 // 1 7 15 3
@@ -129,8 +122,6 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                 // patterns mid-evolution
 
                 agent->resetBrain();
-
-                blockPos = 0;
 
                 // Generate world
                 world_state = patterns[patternIndex];
@@ -162,10 +153,11 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                 // World loop
                 for (timestep = 0; timestep < WORLD_HEIGHT; timestep++) {
                     world_state = world[timestep];
+
                     // Activate sensors if block is in line of sight
                     // TODO(wmayner) parametrize sensor location on agent body
-                    agent->states[0] = world_state[worldTransform[agentCells[0]]];
-                    agent->states[1] = world_state[worldTransform[agentCells[2]]];
+                    agent->states[0] = world_state[worldTransform[agentPos]];
+                    agent->states[1] = world_state[worldTransform[agentPos + 2]];
 
                     // TODO(wmayner) parameterize changing sensors mid-evolution
                     // Larissa: Set to 0 to evolve agents with just one sensor
@@ -218,12 +210,12 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                         // Left motor on
                         case 1:
                             // Move right
-                            agentPos = (agentPos + 1) % (WORLD_WIDTH - 1);
+                            agentPos = (agentPos + 1) % WORLD_WIDTH;
                             break;
                         // Right motor on
                         case 2:
                             // Move left
-                            agentPos = (agentPos - 1) % (WORLD_WIDTH - 1);
+                            agentPos = (agentPos - 1) % WORLD_WIDTH;
                             break;
                     }
 
@@ -231,8 +223,8 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
 
                 // Check for hit
                 hit = false;
-                for (int i = 0; i < agentCells.size(); i++) {
-                    if (world_state[agentCells[i]] == 1) {
+                for (int i = 0; i < 3; i++) {
+                    if (world_state[(agentPos + i) % WORLD_WIDTH] == 1) {
                         hit = true;
                     }
                 }
