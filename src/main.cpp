@@ -26,7 +26,7 @@ double perSiteMutationRate = 0.005;
 int generation = 0;
 int repeats = 1;
 int numAgents = 100;
-int numGenerations = 32;
+int numGenerations = 10000;
 char trialName[1000];
 double sensorNoise = 0.0;
 
@@ -103,9 +103,10 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        cout << generation << " " << (double)maxFitness << ""
-            " " << agent[who]->correct << "/" << agent[who]->incorrect << ""
-            " " << (float)agent[who]->correct / (83.0 * 82.0) << endl;
+        cout << "Generation " << generation << ": [fitness] " <<
+            (double)maxFitness << " [correct/incorrect] " << agent[who]->correct <<
+            "/" << agent[who]->incorrect << " [\% correct] " <<
+            (float)agent[who]->correct / (83.0 * 82.0) << endl;
 
         for (i = 0; i < agent.size(); i++) {
             Agent *d;
