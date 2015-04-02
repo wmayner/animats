@@ -19,6 +19,9 @@
 
 int rndX, rndY, rndZ, rndW;
 
+int randInt (int i) {
+    return rand() % i;
+}
 
 Game::Game(char* filename) {
     FILE *f = fopen(filename, "r+w");
@@ -63,7 +66,16 @@ void Game::applyNoise(Agent *agent, double sensorNoise) {
  */
 vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
         repeat) {
-    bitset<WORLD_WIDTH> world, old_world;
+    bitset<WORLD_WIDTH> world_state, old_world_state;
+
+    vector< bitset<WORLD_WIDTH> > world;
+    world.clear();
+    world.resize(WORLD_HEIGHT);
+
+    // Permutation that redirects agent's sensors. Defaults to doing nothing
+    // (identity permutation).
+    vector<int> worldTransform;
+    for (int i = 0; i < WORLD_WIDTH; i++) worldTransform.push_back(i);
 
     // TODO(wmayner) parametrize agent size
     // This holds the position of each cell in the agents body
@@ -116,18 +128,44 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                 // TODO(wmayner) add logic outside of Game to change the
                 // patterns mid-evolution
 
-                world = patterns[patternIndex];
-
                 agent->resetBrain();
 
                 blockPos = 0;
 
+                // Generate world
+                world_state = patterns[patternIndex];
+                for (timestep = 0; timestep < WORLD_HEIGHT; timestep++) {
+                    world.push_back(world_state);
+                    old_world_state = world_state;
+                    // Move the block
+                    if (direction == -1) {
+                        // Left
+                        world_state = old_world_state >> 1;
+                        world_state[WORLD_WIDTH - 1] = old_world_state[0];
+                    } else {
+                        // Right
+                        world_state = old_world_state << 1;
+                        world_state[0] = old_world_state[WORLD_WIDTH - 1];
+                    }
+                }
+
+                if (SCRAMBLE_WORLD) {
+                    // Scramble time
+                    random_shuffle(world.begin(), world.end(),
+                            randInt);
+                    // Scramble space (what animat sees will be determined by
+                    // the transform)
+                    random_shuffle(worldTransform.begin(),
+                            worldTransform.end(), randInt);
+                }
+
                 // World loop
                 for (timestep = 0; timestep < WORLD_HEIGHT; timestep++) {
+                    world_state = world[timestep];
                     // Activate sensors if block is in line of sight
                     // TODO(wmayner) parametrize sensor location on agent body
-                    agent->states[0] = world[agentCells[0]];
-                    agent->states[1] = world[agentCells[2]];
+                    agent->states[0] = world_state[worldTransform[agentCells[0]]];
+                    agent->states[1] = world_state[worldTransform[agentCells[2]]];
 
                     // TODO(wmayner) parameterize changing sensors mid-evolution
                     // Larissa: Set to 0 to evolve agents with just one sensor
@@ -189,23 +227,12 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                             break;
                     }
 
-                    old_world = world;
-                    // Move the block
-                    if (direction == -1) {
-                        // Left
-                        world = old_world >> 1;
-                        world[WORLD_WIDTH - 1] = old_world[0];
-                    } else {
-                        // Right
-                        world = old_world << 1;
-                        world[0] = old_world[WORLD_WIDTH - 1];
-                    }
                 }
 
                 // Check for hit
                 hit = false;
                 for (int i = 0; i < agentCells.size(); i++) {
-                    if (world[agentCells[i]] == 1) {
+                    if (world_state[agentCells[i]] == 1) {
                         hit = true;
                     }
                 }
