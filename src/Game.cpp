@@ -75,9 +75,10 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
     // Permutation that redirects agent's sensors. Defaults to doing nothing
     // (identity permutation).
     vector<int> worldTransform;
-    for (int i = 0; i < WORLD_WIDTH; i++) worldTransform.push_back(i);
+    worldTransform.resize(WORLD_WIDTH);
+    for (int i = 0; i < WORLD_WIDTH; i++) worldTransform[i] = i;
 
-    int initAgentPos, agentPos, blockPos, past_state, current_state;
+    int initAgentPos, agentPos, past_state, current_state;
     int patternIndex, direction, timestep;
     int action;
 
@@ -85,6 +86,7 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
     vector< vector<int> > stateTransitions;
     stateTransitions.clear();
     stateTransitions.resize(2);
+
     // Make random seeds unique from one another by including index
     rndW = agent->ID + repeat;
     rndX = ~(agent->ID + repeat);
@@ -96,9 +98,8 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
 
     bool hit;
 
-    agent->numCorrectByPattern.resize(patterns.size());
-
     // Record the number of correct outcomes for each different type of block
+    agent->numCorrectByPattern.resize(patterns.size());
     for (int i = 0; i < agent->numCorrectByPattern.size(); i++) {
         agent->numCorrectByPattern[i] = 0;
     }
@@ -111,8 +112,6 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
             for (initAgentPos = 0; initAgentPos < WORLD_WIDTH; initAgentPos++)
             {
                 agentPos = initAgentPos;
-                // Block always starts at top-left
-                blockPos = 0;
 
                 // Larissa: Change environment after 30,000 Gen, if patterns is
                 // 1 7 15 3 it changes from 2 blocks with 1 7 to 4 blocks with
@@ -124,9 +123,11 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                 agent->resetBrain();
 
                 // Generate world
+                world.resize(WORLD_HEIGHT);
                 world_state = patterns[patternIndex];
+
                 for (timestep = 0; timestep < WORLD_HEIGHT; timestep++) {
-                    world.push_back(world_state);
+                    world[timestep] = world_state;
                     old_world_state = world_state;
                     // Move the block
                     if (direction == -1) {
@@ -142,8 +143,7 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
 
                 if (SCRAMBLE_WORLD) {
                     // Scramble time
-                    random_shuffle(world.begin(), world.end(),
-                            randInt);
+                    random_shuffle(world.begin(), world.end(), randInt);
                     // Scramble space (what animat sees will be determined by
                     // the transform)
                     random_shuffle(worldTransform.begin(),
@@ -167,7 +167,8 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                     // Set motors to 0 to prevent them from influencing next
                     // animat state
                     // TODO(wmayner) parametrize motor node indices
-                    agent->states[6] = 0; agent->states[7] = 0;
+                    agent->states[6] = 0;
+                    agent->states[7] = 0;
 
                     past_state = 0;
                     for (int n = 0; n < NUM_NODES; n++) {
@@ -218,11 +219,11 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                             agentPos = (agentPos - 1) % WORLD_WIDTH;
                             break;
                     }
-
                 }
 
                 // Check for hit
                 hit = false;
+                // TODO(wmayner) un-hardcode agent body size
                 for (int i = 0; i < 3; i++) {
                     if (world_state[(agentPos + i) % WORLD_WIDTH] == 1) {
                         hit = true;
