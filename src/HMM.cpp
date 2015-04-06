@@ -3,7 +3,6 @@
 #include <vector>
 
 #include "./HMM.hpp"
-// #define feedbackON
 
 
 HMMU::HMMU() {}
@@ -13,12 +12,6 @@ HMMU::~HMMU() {
     sums.clear();
     ins.clear();
     outs.clear();
-    posLevelOfFB.clear();
-    negLevelOfFB.clear();
-    chosenInPos.clear();
-    chosenInNeg.clear();
-    chosenOutPos.clear();
-    chosenOutNeg.clear();
 }
 
 void HMMU::setup(vector<unsigned char> &genome, int start) {
@@ -29,27 +22,13 @@ void HMMU::setup(vector<unsigned char> &genome, int start) {
 
     _xDim = 1 + (genome[(k++) % genome.size()] & 3);
     _yDim = 1 + (genome[(k++) % genome.size()] & 3);
-    posFBNode = genome[(k++) % genome.size()] & (NUM_NODES - 1);
-    negFBNode = genome[(k++) % genome.size()] & (NUM_NODES - 1);
-    nrPos = genome[(k++) % genome.size()] & 3;
-    nrNeg = genome[(k++) % genome.size()] & 3;
     ins.resize(_yDim);
     outs.resize(_xDim);
-    posLevelOfFB.resize(nrPos);
-    negLevelOfFB.resize(nrNeg);
     for (i = 0; i < _yDim; i++)
         ins[i] = genome[(k + i) % genome.size()] & (NUM_NODES - 1);
     for (i = 0; i < _xDim; i++)
         outs[i] = genome[(k + 4 + i) % genome.size()] & (NUM_NODES - 1);
-    for (i = 0; i < nrPos; i++)
-        posLevelOfFB[i] = (int)(1 + genome[(k + 8 + i) % genome.size()]);
-    for (i = 0; i < nrNeg; i++)
-        negLevelOfFB[i] = (int)(1 + genome[(k + 12 + i) % genome.size()]);
-    chosenInPos.clear();
-    chosenInNeg.clear();
-    chosenOutPos.clear();
-    chosenOutNeg.clear();
-
+    // TODO(wmayner) parametrize this hardcoded constant
     k = k + 16;
     hmm.resize(1 << _yDim);
     sums.resize(1 << _yDim);
@@ -74,26 +53,12 @@ void HMMU::setupQuick(vector<unsigned char> &genome, int start) {
 
     _xDim = 1 + (genome[(k++) % genome.size()] & 3);
     _yDim = 1 + (genome[(k++) % genome.size()] & 3);
-    posFBNode = genome[(k++) % genome.size()] & (NUM_NODES - 1);
-    negFBNode = genome[(k++) % genome.size()] & (NUM_NODES - 1);
-    nrPos = genome[(k++) % genome.size()] & 3;
-    nrNeg = genome[(k++) % genome.size()] & 3;
     ins.resize(_yDim);
     outs.resize(_xDim);
-    posLevelOfFB.resize(nrPos);
-    negLevelOfFB.resize(nrNeg);
     for (i = 0; i < _yDim; i++)
         ins[i] = genome[(k + i) % genome.size()] & (NUM_NODES - 1);
     for (i = 0; i < _xDim; i++)
         outs[i] = genome[(k + 4 + i) % genome.size()] & (NUM_NODES - 1);
-    for (i = 0; i < nrPos; i++)
-        posLevelOfFB[i] = (int)(1 + genome[(k + 8 + i) % genome.size()]);
-    for (i = 0; i < nrNeg; i++)
-        negLevelOfFB[i] = (int)(1 + genome[(k + 12 + i) % genome.size()]);
-    chosenInPos.clear();
-    chosenInNeg.clear();
-    chosenOutPos.clear();
-    chosenOutNeg.clear();
 
     k += 16;
     hmm.resize(1 << _yDim);
@@ -112,29 +77,6 @@ void HMMU::setupQuick(vector<unsigned char> &genome, int start) {
 void HMMU::update(unsigned char *states, unsigned char *newStates) {
     int I = 0;
     int i, j, r;
-#ifdef feedbackON
-    cout << "Feedback ON" << endl;
-    if ((nrPos != 0) && (states[posFBNode] == 1)) {
-        for (i = 0; i < chosenInPos.size(); i++) {
-            // A random number is drawn because the program allows for
-            // non-deterministic mechanisms
-            mod = (unsigned char)(rand() % (int)posLevelOfFB[i]);
-            if ((hmm[chosenInPos[i]][chosenOutPos[i]] + mod) < 255) {
-                hmm[chosenInPos[i]][chosenOutPos[i]] += mod;
-                sums[chosenInPos[i]] += mod;
-            }
-        }
-    }
-    if ((nrNeg != 0) && (states[negFBNode] == 1)) {
-        for (i = 0; i < chosenInNeg.size(); i++) {
-            mod = (unsigned char)(rand() % (int)negLevelOfFB[i]);
-            if ((hmm[chosenInNeg[i]][chosenOutNeg[i]] - mod) > 0) {
-                hmm[chosenInNeg[i]][chosenOutNeg[i]] -= mod;
-                sums[chosenInNeg[i]] -= mod;
-            }
-        }
-    }
-#endif
     for (i = 0; i < ins.size(); i++)
         I = (I << 1) + ((states[ins[i]]) & 1);
     // r is a random number between probably 1 and 255 and is only important
@@ -151,16 +93,6 @@ void HMMU::update(unsigned char *states, unsigned char *newStates) {
         newStates[outs[i]] |= (j >> i) & 1;
         // newStates[outs[i]] = (j >> i) & 1;
     }
-#ifdef feedbackON
-    chosenInPos.push_back(I);
-    chosenInNeg.push_back(I);
-    chosenOutPos.push_back(j);
-    chosenOutNeg.push_back(j);
-    while (chosenInPos.size() > nrPos) chosenInPos.pop_front();
-    while (chosenOutPos.size() > nrPos) chosenOutPos.pop_front();
-    while (chosenInNeg.size() > nrNeg) chosenInNeg.pop_front();
-    while (chosenOutNeg.size() > nrNeg) chosenOutNeg.pop_front();
-#endif
 }
 
 void HMMU::deterministicUpdate(
@@ -198,18 +130,6 @@ void HMMU::show(void) {
         }
         cout << endl;
     }
-    cout << endl;
-    cout << "posFB: " << (int)posFBNode << " negFB: " << (int)negFBNode << endl;
-    cout << "posQue:" << endl;
-    for (i = 0; i < posLevelOfFB.size(); i++) {
-        cout << (int)posLevelOfFB[i] << " ";
-    }
-    cout << endl;
-    cout << "negQue:" << endl;
-    for (i = 0; i < negLevelOfFB.size(); i++) {
-        cout << (int)negLevelOfFB[i] << " ";
-    }
-    cout << endl;
     // for(i=0;i<hmm.size();i++){
     //     for(j=0;j<hmm[i].size();j++)
     //         cout<<(int)hmm[i][j]<<" ";

@@ -19,10 +19,6 @@ class HMMU{
     vector< vector<unsigned char> > hmm;
     vector<unsigned int> sums;
     vector<unsigned char> ins, outs;
-    unsigned char posFBNode, negFBNode;
-    unsigned char nrPos, nrNeg;
-    vector<int> posLevelOfFB, negLevelOfFB;
-    deque<unsigned char> chosenInPos, chosenInNeg, chosenOutPos, chosenOutNeg;
 
     unsigned char _xDim, _yDim;
     HMMU();
