@@ -11,7 +11,8 @@
 #include "./constants.hpp"
 #include "./Agent.hpp"
 
-using namespace std;
+using std::vector;
+using std::bitset;
 
 class Game {
  public:

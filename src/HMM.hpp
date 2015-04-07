@@ -12,7 +12,7 @@
 
 #include "./constants.hpp"
 
-using namespace std;
+using std::vector;
 
 class HMMU{
  public:

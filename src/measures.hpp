@@ -13,7 +13,9 @@
 
 #include "./constants.hpp"
 
-using namespace std;
+using std::vector;
+using std::map;
+using std::set;
 
 double mutualInformation(vector<int> A, vector<int> B);
 double ei(vector<int> A, vector<int> B, int theMask);

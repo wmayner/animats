@@ -19,7 +19,7 @@
 
 int rndX, rndY, rndZ, rndW;
 
-int randInt (int i) {
+int randInt(int i) {
     return rand() % i;
 }
 
@@ -109,8 +109,7 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
         // Directions (left/right)
         for (direction = -1; direction < 2; direction += 2) {
             // Agent starting position
-            for (initAgentPos = 0; initAgentPos < WORLD_WIDTH; initAgentPos++)
-            {
+            for (initAgentPos = 0; initAgentPos < WORLD_WIDTH; initAgentPos++) {
                 agentPos = initAgentPos;
 
                 // Larissa: Change environment after 30,000 Gen, if patterns is
@@ -252,7 +251,6 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                         agent->numCorrectByPattern[patternIndex]++;
                     }
                 }
-
             }  // Agent starting position
         }  // Directions
     }  // Block patterns

@@ -18,8 +18,6 @@
 #include "./Game.hpp"
 #include "./analysis.hpp"
 
-#define randDouble ((double)rand() / (double)RAND_MAX)
-
 using namespace std;
 
 double perSiteMutationRate = 0.005;
@@ -105,7 +103,7 @@ int main(int argc, char *argv[]) {
 
         cout << "Generation " << generation << ": [fitness] " <<
             (double)maxFitness << " [correct/incorrect] " << agent[who]->correct <<
-            "/" << agent[who]->incorrect << " [\% correct] " <<
+            "/" << agent[who]->incorrect << " [percent correct] " <<
             (float)agent[who]->correct / (83.0 * 82.0) << endl;
 
         for (i = 0; i < agent.size(); i++) {
