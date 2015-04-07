@@ -15,36 +15,6 @@ HMMU::~HMMU() {
 }
 
 void HMMU::setup(vector<unsigned char> &genome, int start) {
-    int i, j, k;
-    ins.clear();
-    outs.clear();
-    k = (start + 2) % genome.size();
-
-    numInputs = 1 + (genome[(k++) % genome.size()] & 3);
-    numOutputs = 1 + (genome[(k++) % genome.size()] & 3);
-    ins.resize(numOutputs);
-    outs.resize(numInputs);
-    for (i = 0; i < numOutputs; i++)
-        ins[i] = genome[(k + i) % genome.size()] & (NUM_NODES - 1);
-    for (i = 0; i < numInputs; i++)
-        outs[i] = genome[(k + 4 + i) % genome.size()] & (NUM_NODES - 1);
-    // TODO(wmayner) parametrize this hardcoded constant
-    k = k + 16;
-    hmm.resize(1 << numOutputs);
-    sums.resize(1 << numOutputs);
-    for (i = 0; i < (1 << numOutputs); i++) {
-        hmm[i].resize(1 << numInputs);
-        for (j = 0; j < (1 << numInputs); j++) {
-            hmm[i][j] = genome[(k + j + ((1 << numInputs) * i)) % genome.size()];
-            if (hmm[i][j] == 0)
-                hmm[i][j] = 1;
-            sums[i] += hmm[i][j];
-        }
-    }
-}
-
-void HMMU::setupQuick(vector<unsigned char> &genome, int start) {
-    int i, j;
     ins.clear();
     outs.clear();
 
@@ -53,32 +23,60 @@ void HMMU::setupQuick(vector<unsigned char> &genome, int start) {
 
     numInputs = 1 + (genome[(scan++) % genome.size()] & 3);
     numOutputs = 1 + (genome[(scan++) % genome.size()] & 3);
-    ins.resize(numOutputs);
-    outs.resize(numInputs);
-    for (i = 0; i < numOutputs; i++)
+    ins.resize(numInputs);
+    outs.resize(numOutputs);
+
+    for (int i = 0; i < numInputs; i++)
         ins[i] = genome[(scan + i) % genome.size()] & (NUM_NODES - 1);
-    for (i = 0; i < numInputs; i++)
+    for (int i = 0; i < numOutputs; i++)
         outs[i] = genome[(scan + 4 + i) % genome.size()] & (NUM_NODES - 1);
 
+    // Probabilities begin after the input and output codons, which are
+    // NUM_NODES long each
     scan += 16;
-    hmm.resize(1 << numOutputs);
-    sums.resize(1 << numOutputs);
-    for (i = 0; i < (1 << numOutputs); i++) {
-        hmm[i].resize(1 << numInputs);
-        for (j = 0; j < (1 << numInputs); j++) {
-            hmm[i][j] = 0;
+
+    // Number of rows
+    int M = 1 << numInputs;
+    // Number of columns
+    int N = 1 << numOutputs;
+
+    hmm.resize(M);
+    sums.resize(M);
+
+    if (DETERMINISTIC) {
+        for (int i = 0; i < M; i++) {
+            hmm[i].resize(N);
+            int largestValueInRow = 0;
+            int largestValueInRowIndex = 0;
+            for (int j = 0; j < (N); j++) {
+                hmm[i][j] = 0;
+                int currentValue = genome[(scan + j + (N * i)) % genome.size()];
+                if (currentValue > largestValueInRow) {
+                    largestValueInRow = currentValue;
+                    largestValueInRowIndex = j;
+                }
+            }
+            hmm[i][largestValueInRowIndex] = 255;
+            sums[i] = 255;
         }
-        hmm[i][genome[(scan + j + ((1 << numInputs) * i)) % genome.size()] &
-                ((1 << numInputs) - 1)] = 255;
-        sums[i] = 255;
+    } else {
+        for (int i = 0; i < M; i++) {
+            hmm[i].resize(N);
+            for (int j = 0; j < N; j++) {
+                hmm[i][j] = genome[(scan + j + (N * i)) % genome.size()];
+                // Don't allow zero-entries
+                // TODO(wmayner) why?
+                if (hmm[i][j] == 0) hmm[i][j] = 1;
+                sums[i] += hmm[i][j];
+            }
+        }
     }
 }
 
 void HMMU::update(unsigned char *currentStates, unsigned char *nextStates) {
-    int i;
     // Encode the given states as an integer to index into the TPM
     int pastStateIndex = 0;
-    for (i = 0; i < ins.size(); i++)
+    for (int i = 0; i < ins.size(); i++)
         pastStateIndex = (pastStateIndex << 1) + ((currentStates[ins[i]]) & 1);
     // Get the next state
     int nextStateIndex = 0;
@@ -101,7 +99,7 @@ void HMMU::update(unsigned char *currentStates, unsigned char *nextStates) {
     }
     // The index of the column we chose is the next state (we take the its bits
     // as the next states of individual nodes)
-    for (i = 0; i < outs.size(); i++) {
+    for (int i = 0; i < outs.size(); i++) {
         nextStates[outs[i]] |= (nextStateIndex >> i) & 1;
     }
 }

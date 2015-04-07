@@ -24,7 +24,6 @@ class HMMU{
     HMMU();
     ~HMMU();
     void setup(vector<unsigned char> &genome, int start);
-    void setupQuick(vector<unsigned char> &genome, int start);
     void update(unsigned char *currentStates, unsigned char *nextStates);
 };
 
