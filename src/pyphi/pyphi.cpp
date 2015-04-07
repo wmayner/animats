@@ -2,7 +2,7 @@
 
 #include "./pyphi.hpp"
 
-using namespace std;
+using std::vector;
 
 
 PyPhi::~PyPhi() {

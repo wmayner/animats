@@ -9,6 +9,7 @@
 #define LOD_RECORD_INTERVAL 100
 
 // Agent parameters
+// TODO(wmayner) make sure this is used everywhere
 #define NUM_NODES 8
 #define NUM_STATES (1 << NUM_NODES)
 #define DETERMINISTIC true

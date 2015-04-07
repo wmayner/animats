@@ -18,7 +18,10 @@
 #include "./Game.hpp"
 #include "./analysis.hpp"
 
-using namespace std;
+using std::vector;
+using std::map;
+using std::endl;
+using std::cout;
 
 double perSiteMutationRate = 0.005;
 int generation = 0;
