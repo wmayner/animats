@@ -20,22 +20,22 @@ void HMMU::setup(vector<unsigned char> &genome, int start) {
     outs.clear();
     k = (start + 2) % genome.size();
 
-    _xDim = 1 + (genome[(k++) % genome.size()] & 3);
-    _yDim = 1 + (genome[(k++) % genome.size()] & 3);
-    ins.resize(_yDim);
-    outs.resize(_xDim);
-    for (i = 0; i < _yDim; i++)
+    numInputs = 1 + (genome[(k++) % genome.size()] & 3);
+    numOutputs = 1 + (genome[(k++) % genome.size()] & 3);
+    ins.resize(numOutputs);
+    outs.resize(numInputs);
+    for (i = 0; i < numOutputs; i++)
         ins[i] = genome[(k + i) % genome.size()] & (NUM_NODES - 1);
-    for (i = 0; i < _xDim; i++)
+    for (i = 0; i < numInputs; i++)
         outs[i] = genome[(k + 4 + i) % genome.size()] & (NUM_NODES - 1);
     // TODO(wmayner) parametrize this hardcoded constant
     k = k + 16;
-    hmm.resize(1 << _yDim);
-    sums.resize(1 << _yDim);
-    for (i = 0; i < (1 << _yDim); i++) {
-        hmm[i].resize(1 << _xDim);
-        for (j = 0; j < (1 << _xDim); j++) {
-            hmm[i][j] = genome[(k + j + ((1 << _xDim) * i)) % genome.size()];
+    hmm.resize(1 << numOutputs);
+    sums.resize(1 << numOutputs);
+    for (i = 0; i < (1 << numOutputs); i++) {
+        hmm[i].resize(1 << numInputs);
+        for (j = 0; j < (1 << numInputs); j++) {
+            hmm[i][j] = genome[(k + j + ((1 << numInputs) * i)) % genome.size()];
             if (hmm[i][j] == 0)
                 hmm[i][j] = 1;
             sums[i] += hmm[i][j];
@@ -44,95 +44,64 @@ void HMMU::setup(vector<unsigned char> &genome, int start) {
 }
 
 void HMMU::setupQuick(vector<unsigned char> &genome, int start) {
-    int i, j, k;
+    int i, j;
     ins.clear();
     outs.clear();
 
-    // Larissa: The % (mod) is to make the genome circular
-    k = (start + 2) % genome.size();
+    // This keeps track of where we are in the genome.
+    int scan = (start + 2) % genome.size();
 
-    _xDim = 1 + (genome[(k++) % genome.size()] & 3);
-    _yDim = 1 + (genome[(k++) % genome.size()] & 3);
-    ins.resize(_yDim);
-    outs.resize(_xDim);
-    for (i = 0; i < _yDim; i++)
-        ins[i] = genome[(k + i) % genome.size()] & (NUM_NODES - 1);
-    for (i = 0; i < _xDim; i++)
-        outs[i] = genome[(k + 4 + i) % genome.size()] & (NUM_NODES - 1);
+    numInputs = 1 + (genome[(scan++) % genome.size()] & 3);
+    numOutputs = 1 + (genome[(scan++) % genome.size()] & 3);
+    ins.resize(numOutputs);
+    outs.resize(numInputs);
+    for (i = 0; i < numOutputs; i++)
+        ins[i] = genome[(scan + i) % genome.size()] & (NUM_NODES - 1);
+    for (i = 0; i < numInputs; i++)
+        outs[i] = genome[(scan + 4 + i) % genome.size()] & (NUM_NODES - 1);
 
-    k += 16;
-    hmm.resize(1 << _yDim);
-    sums.resize(1 << _yDim);
-    for (i = 0; i < (1 << _yDim); i++) {
-        hmm[i].resize(1 << _xDim);
-        for (j = 0; j < (1 << _xDim); j++) {
+    scan += 16;
+    hmm.resize(1 << numOutputs);
+    sums.resize(1 << numOutputs);
+    for (i = 0; i < (1 << numOutputs); i++) {
+        hmm[i].resize(1 << numInputs);
+        for (j = 0; j < (1 << numInputs); j++) {
             hmm[i][j] = 0;
         }
-        hmm[i][genome[(k + j+ ((1 << _xDim) * i)) % genome.size()] &
-                ((1 << _xDim) - 1)] = 255;
+        hmm[i][genome[(scan + j + ((1 << numInputs) * i)) % genome.size()] &
+                ((1 << numInputs) - 1)] = 255;
         sums[i] = 255;
     }
 }
 
-void HMMU::update(unsigned char *states, unsigned char *newStates) {
-    int I = 0;
-    int i, j, r;
+void HMMU::update(unsigned char *currentStates, unsigned char *nextStates) {
+    int i;
+    // Encode the given states as an integer to index into the TPM
+    int pastStateIndex = 0;
     for (i = 0; i < ins.size(); i++)
-        I = (I << 1) + ((states[ins[i]]) & 1);
-    // r is a random number between probably 1 and 255 and is only important
-    // for probabilistic gates
-    r = 1 + (rand() % (sums[I] - 1));
-    j = 0;
-    // for deterministic gates the while loop doesn't do anything except
-    // increase j until hmm[I][j] is 255
-    while (r > hmm[I][j]) {
-        r -= hmm[I][j];
-        j++;
-    }
-    for (i = 0; i < outs.size(); i++) {
-        newStates[outs[i]] |= (j >> i) & 1;
-        // newStates[outs[i]] = (j >> i) & 1;
-    }
-}
-
-void HMMU::deterministicUpdate(
-        unsigned char *states, unsigned char *newStates) {
-    int I = 0;
-    int i , j;
-    for (i = 0; i < ins.size(); i++)
-        I = (I << 1) + ((states[ins[i]]) & 1);
-    j = 0;
-    // r above doesn't do anything else then checking if hmm is larger than 0
-    while (1 > hmm[I][j]) {
-        j++;
-    }
-    for (i = 0; i < outs.size(); i++) {
-        newStates[outs[i]] |= (j >> i) & 1;
-    }
-    // newStates[outs[i]] = (j >> i) & 1;
-}
-
-void HMMU::show(void) {
-    int i, j;
-    cout << "INS: ";
-    for (i = 0; i < ins.size(); i++) {
-        cout << (int)ins[i] <<" ";
-    }
-    cout << endl;
-    cout << "OUTS: ";
-    for (i = 0; i < outs.size(); i++) {
-        cout << (int)outs[i] << " ";
-    }
-    cout << endl;
-    for (i = 0; i < hmm.size(); i++) {
-        for (j = 0; j < hmm[i].size(); j++) {
-            cout << " " << (double)hmm[i][j] / sums[i];
+        pastStateIndex = (pastStateIndex << 1) + ((currentStates[ins[i]]) & 1);
+    // Get the next state
+    int nextStateIndex = 0;
+    if (DETERMINISTIC) {
+        // Find the index of the 1 in this row
+        while (1 > hmm[pastStateIndex][nextStateIndex]) {
+            nextStateIndex++;
         }
-        cout << endl;
+    } else {
+        // Randomly pick a column index with probabilities weighted by the entries
+        // in the column.
+        int r = 1 + (rand() % (sums[pastStateIndex] - 1));
+        while (r > hmm[pastStateIndex][nextStateIndex]) {
+            // Decrease the random threshold because it's given that we didn't
+            // pick column nextStateIndex, which we would have with probability
+            // hmm[pastStateIndex][nextStateIndex].
+            r -= hmm[pastStateIndex][nextStateIndex];
+            nextStateIndex++;
+        }
     }
-    // for(i=0;i<hmm.size();i++){
-    //     for(j=0;j<hmm[i].size();j++)
-    //         cout<<(int)hmm[i][j]<<" ";
-    //     cout<<endl;
-    // }
+    // The index of the column we chose is the next state (we take the its bits
+    // as the next states of individual nodes)
+    for (i = 0; i < outs.size(); i++) {
+        nextStates[outs[i]] |= (nextStateIndex >> i) & 1;
+    }
 }

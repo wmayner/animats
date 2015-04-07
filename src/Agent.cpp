@@ -218,12 +218,6 @@ void Agent::saveLOD(FILE *statsFile,FILE *genomeFile){
     }
 }
 
-void Agent::showPhenotype(void){
-	for(int i=0;i<hmmus.size();i++)
-		hmmus[i]->show();
-	cout<<"------"<<endl;
-}
-
 void Agent::saveToDot(char *filename){
 	FILE *f=fopen(filename,"w+t");
 	int i,j,k;
@@ -314,7 +308,7 @@ void Agent::saveLogicTableSingleAnimat(FILE *f){
 		}
         // update States deterministically, without using random number generator
         for(k=0;k<hmmus.size();k++)
-            hmmus[k]->deterministicUpdate(&states[0],&newStates[0]);
+            hmmus[k]->update(&states[0],&newStates[0]);
         for(k=0;k<NUM_NODES;k++){
             states[k]=newStates[k];
             newStates[k]=0;

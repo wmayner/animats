@@ -252,6 +252,7 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                         agent->numCorrectByPattern[patternIndex]++;
                     }
                 }
+
             }  // Agent starting position
         }  // Directions
     }  // Block patterns

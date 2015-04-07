@@ -20,14 +20,12 @@ class HMMU{
     vector<unsigned int> sums;
     vector<unsigned char> ins, outs;
 
-    unsigned char _xDim, _yDim;
+    unsigned char numInputs, numOutputs;
     HMMU();
     ~HMMU();
     void setup(vector<unsigned char> &genome, int start);
     void setupQuick(vector<unsigned char> &genome, int start);
-    void update(unsigned char *states, unsigned char *newStates);
-    void deterministicUpdate(unsigned char *states, unsigned char *newStates);
-    void show(void);
+    void update(unsigned char *currentStates, unsigned char *nextStates);
 };
 
 #endif  // SRC_HMM_H_

@@ -10,6 +10,7 @@
 
 // Agent parameters
 #define NUM_NODES 8
+#define DETERMINISTIC true
 
 // World parameters
 #define WORLD_HEIGHT 36
