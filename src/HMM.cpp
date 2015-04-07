@@ -5,16 +5,7 @@
 #include "./HMM.hpp"
 
 
-HMMU::HMMU() {}
-
-HMMU::~HMMU() {
-    hmm.clear();
-    sums.clear();
-    ins.clear();
-    outs.clear();
-}
-
-void HMMU::setup(vector<unsigned char> &genome, int start) {
+HMMU::HMMU(vector<unsigned char> &genome, int start) {
     ins.clear();
     outs.clear();
 
@@ -102,4 +93,11 @@ void HMMU::update(unsigned char *currentStates, unsigned char *nextStates) {
     for (int i = 0; i < outs.size(); i++) {
         nextStates[outs[i]] |= (nextStateIndex >> i) & 1;
     }
+}
+
+HMMU::~HMMU() {
+    hmm.clear();
+    sums.clear();
+    ins.clear();
+    outs.clear();
 }

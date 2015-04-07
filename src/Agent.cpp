@@ -120,17 +120,9 @@ void Agent::setupPhenotype(void){
 	hmmus.clear();
 	for(i=0;i<genome.size();i++){
 		if((genome[i]==42)&&(genome[(i+1)%genome.size()]==(255-42))){
-			hmmu=new HMMU;
-			hmmu->setup(genome, i);
+			hmmu=new HMMU(genome, i);
 			hmmus.push_back(hmmu);
 		}
-        /*
-		if((genome[i]==43)&&(genome[(i+1)%genome.size()]==(255-43))){
-			hmmu=new HMMU;
-			hmmu->setup(genome, i);
-			hmmus.push_back(hmmu);
-		}
-         */
 	}
 }
 

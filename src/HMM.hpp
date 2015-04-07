@@ -19,12 +19,11 @@ class HMMU{
     vector< vector<unsigned char> > hmm;
     vector<unsigned int> sums;
     vector<unsigned char> ins, outs;
-
     unsigned char numInputs, numOutputs;
-    HMMU();
-    ~HMMU();
-    void setup(vector<unsigned char> &genome, int start);
+
+    HMMU(vector<unsigned char> &genome, int start);
     void update(unsigned char *currentStates, unsigned char *nextStates);
+    ~HMMU();
 };
 
 #endif  // SRC_HMM_H_
