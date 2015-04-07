@@ -4,21 +4,18 @@
 
 
 Agent::Agent(){
-	int i;
 	nrPointingAtMe=1;
-	ancestor=NULL;
-	for(i=0;i<NUM_NODES;i++){
-		states[i]=0;
-		newStates[i]=0;
+	ancestor = NULL;
+	for(int i = 0; i < NUM_NODES; i++) {
+		states[i] = 0;
+		newStates[i] = 0;
 	}
-	bestSteps=-1;
 	ID=masterID;
 	masterID++;
 	saved=false;
 	hmmus.clear();
 	nrOfOffspring=0;
 	totalSteps=0;
-	retired=false;
 	food=0;
 }
 
@@ -32,12 +29,11 @@ Agent::~Agent(){
 	}
 }
 
-void Agent::setupRandomAgent(int nucleotides){
-	int i;
+void Agent::setupEmptyAgent(int nucleotides) {
 	genome.resize(nucleotides);
-	for(i=0;i<nucleotides;i++)
-		genome[i]=127;//rand()&255;
-	//ampUpStartCodons();   //Larissa: To initially boost evolution uncomment
+	for (int i = 0; i < nucleotides; i++) {
+		genome[i]=127;
+    }
 	setupPhenotype();
 }
 void Agent::loadAgent(char* filename){
@@ -111,6 +107,7 @@ void Agent::inherit(Agent *from,double mutationRate,int theTime){
 	setupPhenotype();
 	fitness=0.0;
 }
+
 void Agent::setupPhenotype(void){
 	int i;
 	HMMU *hmmu;
@@ -124,13 +121,6 @@ void Agent::setupPhenotype(void){
 			hmmus.push_back(hmmu);
 		}
 	}
-}
-
-void Agent::retire(void){
-}
-
-unsigned char * Agent::getStatesPointer(void){
-	return states;
 }
 
 void Agent::resetBrain(void){
@@ -147,129 +137,6 @@ void Agent::updateStates(void){
 		newStates[i]=0;
 	}
 	totalSteps++;
-}
-
-void Agent::showBrain(void){
-	for(int i=0;i<NUM_NODES;i++)
-		cout<<(int)states[i];
-	cout<<endl;
-}
-
-void Agent::initialize(int x, int y, int d){
-	xPos=x;
-	yPos=y;
-	direction=d;
-	steps=0;
-	/*
-	if((rand()&1)==0){
-		scramble[1]=2;
-		scramble[2]=1;
-	}
-	*/
-}
-
-Agent* Agent::findLMRCA(void){
-	Agent *r,*d;
-	if(ancestor==NULL)
-		return NULL;
-	else{
-		r=ancestor;
-		d=NULL;
-		while(r->ancestor!=NULL){
-			if(r->ancestor->nrPointingAtMe!=1)
-				d=r;
-			r=r->ancestor;
-		}
-		return d;
-	}
-}
-
-void Agent::saveFromLMRCAtoNULL(FILE *statsFile,FILE *genomeFile){
-	if(ancestor!=NULL)
-		ancestor->saveFromLMRCAtoNULL(statsFile,genomeFile);
-	if(!saved){
-		fprintf(statsFile,"%i	%i	%lu	%f	%i	%f	%i	%i\n",ID,born,genome.size(),fitness,bestSteps,(float)totalSteps/(float)nrOfOffspring,correct,incorrect);
-		fprintf(genomeFile,"%i	",ID);
-		for(int i=0;i<genome.size();i++)
-			fprintf(genomeFile,"	%i",genome[i]);
-		fprintf(genomeFile,"\n");
-		saved=true;
-	}
-	if((saved)&&(retired)) genome.clear();
-}
-void Agent::saveLOD(FILE *statsFile,FILE *genomeFile){
-	if(ancestor!=NULL)
-		ancestor->saveLOD(statsFile,genomeFile);
-    fprintf(statsFile,"%i	%i	%f	%i	%f	%i	%i\n",ID,born,fitness,bestSteps,(float)totalSteps/(float)nrOfOffspring,correct,incorrect);
-    if(!retired){
-        for(int i=0;i<genome.size();i++)
-            fprintf(genomeFile,"%i  ",genome[i]);
-        fprintf(genomeFile,"\n");
-    }
-}
-
-void Agent::saveToDot(char *filename){
-	FILE *f=fopen(filename,"w+t");
-	int i,j,k;
-	fprintf(f,"digraph brain {\n");
-	fprintf(f,"	ranksep=2.0;\n");
-	for(i=0;i<9;i++)
-		fprintf(f,"	%i [shape=invtriangle,style=filled,color=red];\n",i);
-	for(i=9;i<18;i++)
-		fprintf(f,"	%i [shape=invtriangle,style=filled,color=orange];\n",i);
-	for(i=18;i<29;i++)
-		fprintf(f,"	%i [shape=circle,color=blue];\n",i);
-	for(i=29;i<32;i++)
-		fprintf(f,"	%i [shape=circle,style=filled,color=green];\n",i);
-	for(i=0;i<hmmus.size();i++){
-	//	fprintf(f,"	{\n");
-		for(j=0;j<hmmus[i]->ins.size();j++){
-			for(k=0;k<hmmus[i]->outs.size();k++)
-				fprintf(f,"	%i	->	%i;\n",hmmus[i]->ins[j],hmmus[i]->outs[k]);
-		}
-	//	fprintf(f,"	}\n");
-	}
-	fprintf(f,"	{ rank=same; 0;  1;  2;  3;  4;  5;  6;  7; 8;}\n");
-	fprintf(f,"	{ rank=same; 9; 10; 11; 12; 13; 14; 15; 16; 17; }\n");
-	fprintf(f,"	{ rank=same; 18; 19; 20; 21; 22; 23; 24; 25; 26; 27; 28;}\n");
-	fprintf(f,"	{ rank=same; 29; 30; 31; }\n");
-	fprintf(f,"}\n");
-	fclose(f);
-}
-void Agent::saveToDotFullLayout(char *filename){
-	FILE *f=fopen(filename,"w+t");
-	int i,j,k;
-	fprintf(f,"digraph brain {\n");
-	fprintf(f,"	ranksep=2.0;\n");
-	for(i=0;i<hmmus.size();i++){
-		fprintf(f,"MM_%i [shape=box]\n",i);
-		for(j=0;j<hmmus[i]->ins.size();j++)
-			fprintf(f,"	t0_%i -> MM_%i\n",hmmus[i]->ins[j],i);
-		for(k=0;k<hmmus[i]->outs.size();k++)
-			fprintf(f,"	MM_%i -> t1_%i\n",i,hmmus[i]->outs[k]);
-
-	}
-	fprintf(f,"}\n");
-}
-
-void Agent::setupDots(int x, int y,double spacing){
-	double xo,yo;
-	int i,j,k;
-	xo=(double)(x-1)*spacing;
-	xo=-(xo/2.0);
-	yo=(double)(y-1)*spacing;
-	yo=-(yo/2.0);
-	dots.resize(x*y);
-	k=0;
-	for(i=0;i<x;i++)
-		for(j=0;j<y;j++){
-//			dots[k].xPos=(double)(rand()%(int)(spacing*x))+xo;
-//			dots[k].yPos=(double)(rand()%(int)(spacing*y))+yo;
-			dots[k].xPos=xo+((double)i*spacing);
-			dots[k].yPos=yo+((double)j*spacing);
-//			cout<<dots[k].xPos<<" "<<dots[k].yPos<<endl;
-			k++;
-		}
 }
 
 void Agent::saveLogicTable(FILE *f){

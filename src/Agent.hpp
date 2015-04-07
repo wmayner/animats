@@ -41,14 +41,13 @@ public:
 	int steps, bestSteps, totalSteps;
 	int ID, nrOfOffspring;
 	bool saved;
-	bool retired;
 	int born;
 	int correct, incorrect;
     vector<int> numCorrectByPattern;
 
 	Agent();
 	~Agent();
-	void setupRandomAgent(int nucleotides);
+	void setupEmptyAgent(int nucleotides);
 	void loadAgent(char* filename);
 	void loadAgentWithTrailer(char* filename);
 	void setupPhenotype(void);

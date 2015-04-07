@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
 
     sensorNoise = atof(argv[6]);
     masterAgent = new Agent;
-    masterAgent->setupRandomAgent(5000);
+    masterAgent->setupEmptyAgent(5000);
     masterAgent->setupPhenotype();
     for (i = 0; i < agent.size(); i++) {
         agent[i] = new Agent;
@@ -118,7 +118,6 @@ int main(int argc, char *argv[]) {
             nextGen[i] = d;
         }
         for (i = 0; i < agent.size(); i++) {
-            agent[i]->retire();
             agent[i]->nrPointingAtMe--;
             if (agent[i]->nrPointingAtMe == 0)
                 delete agent[i];
