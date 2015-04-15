@@ -27,7 +27,7 @@ double perSiteMutationRate = 0.005;
 int generation = 0;
 int repeats = 1;
 int numAgents = 100;
-int numGenerations = 10000;
+int numGenerations = 1000;
 char trialName[1000];
 double sensorNoise = 0.0;
 
@@ -68,6 +68,7 @@ int main(int argc, char *argv[]) {
     nextGen.resize(agent.size());
     masterAgent->nrPointingAtMe--;
     cout << "Setup complete." << endl;
+    int startTime = time(NULL);
     while (generation < numGenerations) {
         for (i = 0; i < agent.size(); i++) {
             agent[i]->fitness = 0.0;
@@ -127,6 +128,8 @@ int main(int argc, char *argv[]) {
         agent = nextGen;
         generation++;
     }
+    int endTime = time(NULL);
+    cout << "Finished simulating " << numGenerations << " generations. Elapsed time: " << (endTime - startTime) << " seconds." << endl;
     // Larissa: put noise to 0 for analysis
     makeFullAnalysis(game, agent[0], argv[4], 0);
     saveLOD(agent[0], LOD, genomeFile);
