@@ -15,7 +15,7 @@ double mutualInformation(vector<int> A, vector<int> B) {
     int i;
     double c = 1.0 / (double)A.size();
     double I = 0.0;
-    for (i = 0; i < A.size(); i++) {
+    for (i = 0; i < (int)A.size(); i++) {
         nrA.insert(A[i]);
         nrB.insert(B[i]);
         pX[A[i]] = 0.0;
@@ -26,7 +26,7 @@ double mutualInformation(vector<int> A, vector<int> B) {
             pXY[*aI][*bI] = 0.0;
         }
     }
-    for (i = 0; i < A.size(); i++) {
+    for (i = 0; i < (int)A.size(); i++) {
         pXY[A[i]][B[i]] += c;
         pX[A[i]] += c;
         pY[B[i]] += c;
@@ -46,7 +46,7 @@ double entropy(vector<int> list) {
     int i;
     double H = 0.0;
     double c = 1.0 / (double)list.size();
-    for (i = 0; i < list.size(); i++) {
+    for (i = 0; i < (int)list.size(); i++) {
         p[list[i]] += c;
     }
     for (pI = p.begin(); pI != p.end(); pI++) {
@@ -58,7 +58,7 @@ double entropy(vector<int> list) {
 double predictiveI(vector<int> A) {
     vector<int> S, I;
     S.clear(); I.clear();
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < (int)A.size(); i++) {
         S.push_back((A[i] >> 12) & (WORLD_WIDTH - 1));
         I.push_back(A[i] & 3);
     }
@@ -68,7 +68,7 @@ double predictiveI(vector<int> A) {
 double nonPredictiveI(vector<int> A) {
     vector<int> S, I;
     S.clear(); I.clear();
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < (int)A.size(); i++) {
         S.push_back((A[i] >> 12) & (WORLD_WIDTH - 1));
         I.push_back(A[i] & 3);
     }
@@ -78,11 +78,11 @@ double nonPredictiveI(vector<int> A) {
 double predictNextInput(vector<int> A) {
     vector<int> S, I;
     S.clear(); I.clear();
-    for (int i = 0; i < A.size(); i++) {
+    for (int i = 0; i < (int)A.size(); i++) {
         S.push_back((A[i] >> 12) & (WORLD_WIDTH - 1));
         I.push_back(A[i] & 3);
     }
     S.erase(S.begin());
-    I.erase(I.begin() + I.size() - 1);
+    I.erase(I.begin() + (int)I.size() - 1);
     return mutualInformation(S, I);
 }

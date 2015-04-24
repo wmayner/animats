@@ -67,7 +67,7 @@ HMMU::HMMU(vector<unsigned char> &genome, int start) {
 void HMMU::update(unsigned char *currentStates, unsigned char *nextStates) {
     // Encode the given states as an integer to index into the TPM
     int pastStateIndex = 0;
-    for (int i = 0; i < ins.size(); i++)
+    for (int i = 0; i < (int)ins.size(); i++)
         pastStateIndex = (pastStateIndex << 1) + ((currentStates[ins[i]]) & 1);
     // Get the next state
     int nextStateIndex = 0;
@@ -90,7 +90,7 @@ void HMMU::update(unsigned char *currentStates, unsigned char *nextStates) {
     }
     // The index of the column we chose is the next state (we take the its bits
     // as the next states of individual nodes)
-    for (int i = 0; i < outs.size(); i++) {
+    for (int i = 0; i < (int)outs.size(); i++) {
         nextStates[outs[i]] |= (nextStateIndex >> i) & 1;
     }
 }

@@ -17,7 +17,7 @@ Agent::Agent() {
 }
 
 Agent::~Agent() {
-    for (int i = 0; i < hmmus.size(); i++) {
+    for (int i = 0; i < (int)hmmus.size(); i++) {
         delete hmmus[i];
     }
     if (ancestor != NULL) {
@@ -28,10 +28,10 @@ Agent::~Agent() {
 }
 
 void Agent::injectStartCodons() {
-    for (int i = 0; i < genome.size(); i++)
+    for (int i = 0; i < (int)genome.size(); i++)
         genome[i] = rand() & 255;
     for (int i = 0; i < 4; i++) {
-        int j = rand() % (genome.size() - 100);
+        int j = rand() % ((int)genome.size() - 100);
         genome[j] = 42;
         genome[j + 1]= 213;
         for (int k = 2; k < 20; k++)
@@ -48,7 +48,7 @@ void Agent::setupEmptyAgent(int nucleotides) {
 }
 
 void Agent::inherit(Agent *parent, double mutationRate, int generation) {
-    int nucleotides = parent->genome.size();
+    int nucleotides = (int)parent->genome.size();
     vector<unsigned char> buffer;
     born = generation;
     ancestor = parent;
@@ -64,8 +64,8 @@ void Agent::inherit(Agent *parent, double mutationRate, int generation) {
         }
     }
     if (mutationRate != 0.0) {
-        if ((randDouble < 0.05) && (genome.size() < 10000)) {
-            int w = 15 + rand() & 511;
+        if ((randDouble < 0.05) && ((int)genome.size() < 10000)) {
+            int w = (15 + rand()) & 511;
             // Duplication
             int s = rand() % ((int)genome.size() - w);
             int o = rand() % (int)genome.size();
@@ -74,9 +74,9 @@ void Agent::inherit(Agent *parent, double mutationRate, int generation) {
                     genome.begin() + s + w);
             genome.insert(genome.begin() + o, buffer.begin(), buffer.end());
         }
-        if ((randDouble < 0.02) && (genome.size() > 1000)) {
+        if ((randDouble < 0.02) && ((int)genome.size() > 1000)) {
             // Deletion
-            int w = 15 + rand() & 511;
+            int w = (15 + rand()) & 511;
             int s = rand() % ((int)genome.size() - w);
             genome.erase(genome.begin() + s, genome.begin() + s + w);
         }
@@ -87,14 +87,14 @@ void Agent::inherit(Agent *parent, double mutationRate, int generation) {
 
 void Agent::setupPhenotype() {
     if (hmmus.size() != 0) {
-        for (int i = 0; i < hmmus.size(); i++) {
+        for (int i = 0; i < (int)hmmus.size(); i++) {
             delete hmmus[i];
         }
     }
     hmmus.clear();
     HMMU *hmmu;
-    for (int i = 0; i < genome.size(); i++) {
-        if ((genome[i] == 42) && (genome[(i + 1) %genome.size()] == 213)) {
+    for (int i = 0; i < (int)genome.size(); i++) {
+        if ((genome[i] == 42) && (genome[(i + 1) % (int)genome.size()] == 213)) {
             hmmu = new HMMU(genome, i);
             hmmus.push_back(hmmu);
         }
@@ -107,7 +107,7 @@ void Agent::resetBrain(void) {
 }
 
 void Agent::updateStates(void) {
-    for (int i = 0; i < hmmus.size(); i++) {
+    for (int i = 0; i < (int)hmmus.size(); i++) {
         hmmus[i]->update(&states[0], &newStates[0]);
     }
     for (int i = 0; i < NUM_NODES; i++) {
@@ -151,7 +151,7 @@ void Agent::saveLogicTableSingleAnimat(FILE *f) {
             states[j] = (i >> j) & 1;
         }
         // update States deterministically, without using random number generator
-        for (int k = 0; k < hmmus.size(); k++)
+        for (int k = 0; k < (int)hmmus.size(); k++)
             hmmus[k]->update(&states[0], &newStates[0]);
         for (int k = 0; k < NUM_NODES; k++) {
             states[k] = newStates[k];
@@ -165,7 +165,7 @@ void Agent::saveLogicTableSingleAnimat(FILE *f) {
 }
 
 void Agent::saveGenome(FILE *f) {
-    for (int i = 0; i < genome.size(); i++) {
+    for (int i = 0; i < (int)genome.size(); i++) {
         fprintf(f, "%i   ", genome[i]);
     }
     fprintf(f, "\n");
@@ -173,9 +173,9 @@ void Agent::saveGenome(FILE *f) {
 
 void Agent::saveEdgeList(char *filename) {
     FILE *f = fopen(filename, "w+t");
-    for (int i = 0; i < hmmus.size(); i++) {
-        for (int j=0; j < hmmus[i]->ins.size(); j++) {
-            for (int k = 0; k < hmmus[i]->outs.size(); k++) {
+    for (int i = 0; i < (int)hmmus.size(); i++) {
+        for (int j=0; j < (int)hmmus[i]->ins.size(); j++) {
+            for (int k = 0; k < (int)hmmus[i]->outs.size(); k++) {
                 fprintf(f, "%i   %i\n", hmmus[i]->ins[j], hmmus[i]->outs[k]);
             }
         }

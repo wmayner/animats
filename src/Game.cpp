@@ -100,12 +100,12 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
 
     // Record the number of correct outcomes for each different type of block
     agent->numCorrectByPattern.resize(patterns.size());
-    for (int i = 0; i < agent->numCorrectByPattern.size(); i++) {
+    for (int i = 0; i < (int)agent->numCorrectByPattern.size(); i++) {
         agent->numCorrectByPattern[i] = 0;
     }
 
     // Block patterns
-    for (patternIndex = 0; patternIndex < patterns.size(); patternIndex++) {
+    for (patternIndex = 0; patternIndex < (int)patterns.size(); patternIndex++) {
         // Directions (left/right)
         for (direction = -1; direction < 2; direction += 2) {
             // Agent starting position

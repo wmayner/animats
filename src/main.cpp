@@ -27,7 +27,7 @@ double perSiteMutationRate = 0.005;
 int generation = 0;
 int repeats = 1;
 int numAgents = 100;
-int numGenerations = 1000;
+int numGenerations = 60000;
 char trialName[1000];
 double sensorNoise = 0.0;
 
@@ -61,7 +61,7 @@ int main(int argc, char *argv[]) {
     masterAgent = new Agent;
     masterAgent->setupEmptyAgent(5000);
     masterAgent->setupPhenotype();
-    for (i = 0; i < agent.size(); i++) {
+    for (i = 0; i < (int)agent.size(); i++) {
         agent[i] = new Agent;
         agent[i]->inherit(masterAgent, 0.01, 0);
     }
@@ -70,25 +70,25 @@ int main(int argc, char *argv[]) {
     cout << "Setup complete." << endl;
     int startTime = time(NULL);
     while (generation < numGenerations) {
-        for (i = 0; i < agent.size(); i++) {
+        for (i = 0; i < (int)agent.size(); i++) {
             agent[i]->fitness = 0.0;
             agent[i]->fitnesses.clear();
         }
-        for (i = 0; i < agent.size(); i++) {
+        for (i = 0; i < (int)agent.size(); i++) {
             for (j = 0; j < repeats; j++) {
                 game->executeGame(agent[i], sensorNoise, j);
                 agent[i]->fitnesses.push_back((float)agent[i]->correct);
             }
         }
         if (generation == game->nowUpdate) {
-            for (i = 0; i < agent.size(); i++) {
+            for (i = 0; i < (int)agent.size(); i++) {
                 makeSingleAgentAnalysis(agent[i], argv[4], i);
             }
         }
 
         maxFitness = 0.0;
 
-        for (i = 0; i < agent.size(); i++) {
+        for (i = 0; i < (int)agent.size(); i++) {
             agent[i]->fitness = 1.0;
             for (j = 0; j < repeats; j++)
                 agent[i]->fitness *= agent[i]->fitnesses[j];
@@ -106,11 +106,10 @@ int main(int argc, char *argv[]) {
         }
 
         cout << "Generation " << generation << ": [fitness] " <<
-            (double)maxFitness << " [correct/incorrect] " << agent[who]->correct <<
-            "/" << agent[who]->incorrect << " [percent correct] " <<
-            (float)agent[who]->correct / (83.0 * 82.0) << endl;
+            (double)maxFitness << " [correct/incorrect] " <<
+            agent[who]->correct << "/" << agent[who]->incorrect << endl;
 
-        for (i = 0; i < agent.size(); i++) {
+        for (i = 0; i < (int)agent.size(); i++) {
             Agent *d;
             d = new Agent;
             do {
@@ -119,7 +118,7 @@ int main(int argc, char *argv[]) {
             d->inherit(agent[j], perSiteMutationRate, generation);
             nextGen[i] = d;
         }
-        for (i = 0; i < agent.size(); i++) {
+        for (i = 0; i < (int)agent.size(); i++) {
             agent[i]->nrPointingAtMe--;
             if (agent[i]->nrPointingAtMe == 0)
                 delete agent[i];
@@ -151,7 +150,7 @@ void saveLOD(Agent *agent, FILE *statsFile, FILE *genomeFile) {
             // Larissa: set noise to 0 for analysis
             fprintf(statsFile, "%i   %i  %i", agent->born, agent->correct,
                     agent->incorrect);
-            for (int i = 0; i < agent->numCorrectByPattern.size(); i++) {
+            for (int i = 0; i < (int)agent->numCorrectByPattern.size(); i++) {
                 fprintf(statsFile, " %i", agent->numCorrectByPattern[i]);
             }
             fprintf(statsFile, "\n");
