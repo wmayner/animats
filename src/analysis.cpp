@@ -32,7 +32,7 @@ void makeFullAnalysis(Game *game, Agent *agent, char *fileLead, double
                 fprintf(f, "current_state_%i,", i);
             }
             fprintf(f, "\n");
-            for (j = 0; j < table[0].size(); j++)  {
+            for (j = 0; j < (int)table[0].size(); j++)  {
                 for (i = 0; i < 8; i++)  {
                     fprintf(f, "%i,", (table[0][j] >> i) & 1);
                 }
