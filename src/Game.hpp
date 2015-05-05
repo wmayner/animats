@@ -7,6 +7,8 @@
 #include <stdlib.h>
 
 #include <vector>
+#include <bitset>
+#include <algorithm>
 
 #include "./constants.hpp"
 #include "./Agent.hpp"

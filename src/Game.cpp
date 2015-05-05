@@ -2,6 +2,7 @@
 
 #include <vector>
 #include <bitset>
+#include <algorithm>
 
 #include "Game.hpp"
 
@@ -142,10 +143,10 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
 
                 if (SCRAMBLE_WORLD) {
                     // Scramble time
-                    random_shuffle(world.begin(), world.end(), randInt);
+                    std::random_shuffle(world.begin(), world.end(), randInt);
                     // Scramble space (what animat sees will be determined by
                     // the transform)
-                    random_shuffle(worldTransform.begin(),
+                    std::random_shuffle(worldTransform.begin(),
                             worldTransform.end(), randInt);
                 }
 
