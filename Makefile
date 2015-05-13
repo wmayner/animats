@@ -25,6 +25,6 @@ run: all
 	# 4. The name of the trial
 	# 5. The random seed (positive integer of any size)
 	# 6. Noise level (float between 0 and 1)
-	./build/main.o parameters/basic0.txt results/trial$(SEED)_LOD.txt results/trial$(SEED)_GEN.txt results/trial$(SEED) $(SEED) 0
+	./build/main.o parameters/basic0.txt results/seed-$(SEED)_LOD.txt results/seed-$(SEED)_GEN.txt results/seed-$(SEED) $(SEED) 0
 
 .PHONY: clean all
