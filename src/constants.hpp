@@ -33,6 +33,6 @@
 
 // Analysis parameters
 // -------------------
-#define LOD_RECORD_INTERVAL 512
+#define LOD_RECORD_INTERVAL 500
 
 #endif  // SRC_CONSTANTS_H_
