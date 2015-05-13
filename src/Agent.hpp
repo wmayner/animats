@@ -33,7 +33,7 @@ class Agent {
     ~Agent();
     void injectStartCodons();
     void setupEmptyAgent(int nucleotides);
-    void inherit(Agent *parent, double mutationRate, int generation);
+    void inherit(Agent *parent, int generation);
     void setupPhenotype();
     void resetBrain();
     void updateStates();

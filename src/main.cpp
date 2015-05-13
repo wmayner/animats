@@ -23,14 +23,9 @@ using std::map;
 using std::endl;
 using std::cout;
 
-int numGenerations = 60000;
-double perSiteMutationRate = 0.005;
-int numAgents = 100;
-double sensorNoise = 0.0;
-
-char trialName[1000];
 int generation = 0;
 int repeats = 1;
+double sensorNoise = 0.0;
 
 void saveLOD(Agent *agent, FILE *statsFile, FILE *genomeFile);
 
@@ -51,7 +46,7 @@ int main(int argc, char *argv[]) {
     } else {
         srand(getpid());
     }
-    agent.resize(numAgents);
+    agent.resize(NUM_AGENTS);
     game = new Game(argv[1]);
 
     sensorNoise = atof(argv[6]);
@@ -60,13 +55,13 @@ int main(int argc, char *argv[]) {
     masterAgent->setupPhenotype();
     for (i = 0; i < (int)agent.size(); i++) {
         agent[i] = new Agent;
-        agent[i]->inherit(masterAgent, perSiteMutationRate, generation);
+        agent[i]->inherit(masterAgent, generation);
     }
     nextGen.resize(agent.size());
     masterAgent->nrPointingAtMe--;
     cout << "Setup complete." << endl;
     int startTime = time(NULL);
-    while (generation < numGenerations) {
+    while (generation < NUM_GENERATIONS) {
         for (i = 0; i < (int)agent.size(); i++) {
             agent[i]->fitness = 0.0;
             agent[i]->fitnesses.clear();
@@ -109,7 +104,7 @@ int main(int argc, char *argv[]) {
             do {
                 j = rand() % (int)agent.size();
             } while (randDouble > (agent[j]->fitness / maxFitness));
-            d->inherit(agent[j], perSiteMutationRate, generation);
+            d->inherit(agent[j], generation);
             nextGen[i] = d;
         }
         for (i = 0; i < (int)agent.size(); i++) {
@@ -122,7 +117,7 @@ int main(int argc, char *argv[]) {
         generation++;
     }
     int endTime = time(NULL);
-    cout << "Finished simulating " << numGenerations << " generations. Elapsed time: " << (endTime - startTime) << " seconds." << endl;
+    cout << "Finished simulating " << NUM_GENERATIONS << " generations. Elapsed time: " << (endTime - startTime) << " seconds." << endl;
     // Larissa: put noise to 0 for analysis
     makeFullAnalysis(game, agent[0], argv[4], 0);
     saveLOD(agent[0], LOD, genomeFile);

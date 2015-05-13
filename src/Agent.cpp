@@ -47,7 +47,7 @@ void Agent::setupEmptyAgent(int nucleotides) {
     setupPhenotype();
 }
 
-void Agent::inherit(Agent *parent, double mutationRate, int generation) {
+void Agent::inherit(Agent *parent, int generation) {
     int nucleotides = (int)parent->genome.size();
     vector<unsigned char> buffer;
     born = generation;
@@ -57,13 +57,13 @@ void Agent::inherit(Agent *parent, double mutationRate, int generation) {
     genome.resize(parent->genome.size());
     // Mutation
     for (int i = 0; i < nucleotides; i++) {
-        if (randDouble < mutationRate) {
+        if (randDouble < MUTATION_RATE) {
             genome[i] = rand() & 255;
         } else {
             genome[i] = parent->genome[i];
         }
     }
-    if (mutationRate != 0.0) {
+    if (MUTATION_RATE != 0.0) {
         if ((randDouble < 0.05) && ((int)genome.size() < 10000)) {
             int w = (15 + rand()) & 511;
             // Duplication
