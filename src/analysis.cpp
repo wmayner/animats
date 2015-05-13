@@ -11,17 +11,23 @@ void makeFullAnalysis(Game *game, Agent *agent, char *fileLead, double
     FILE *f;
     int i, j;
     vector< vector<int> > table;
-    while (agent != NULL) {
-        if ((agent->born & LOD_RECORD_INTERVAL) == 0) {
+
+    vector<Agent*> lineage;
+    Agent *localAgent = agent;
+    while (localAgent != NULL) {
+        lineage.push_back(localAgent);
+        localAgent = localAgent->ancestor;
+    }
+    for (int gen = 0; gen < (int)lineage.size(); gen++) {
+        agent = lineage[gen];
+        if ((agent->born % LOD_RECORD_INTERVAL) == 0) {
             // TPM transition list
-            sprintf(filename, "%s_%i_FullLogicTable.txt", fileLead,
-                    agent->born);
+            sprintf(filename, "%s_gen-%i_tpm.txt", fileLead, agent->born);
             f = fopen(filename, "w+t");
             agent->saveLogicTable(f);
             fclose(f);
             // Lifetime transition list
-            sprintf(filename, "%s_%i_LifetimeLogicTable.txt", fileLead,
-                    agent->born);
+            sprintf(filename, "%s_gen-%i_transitions.txt", fileLead, agent->born);
             f = fopen(filename, "w+t");
             table = game->executeGame(agent, sensorNoise);
             for (i = 0; i < 8; i++) {
@@ -44,7 +50,7 @@ void makeFullAnalysis(Game *game, Agent *agent, char *fileLead, double
             }
             fclose(f);
             // Edge list
-            sprintf(filename, "%s_%i_EdgeList.txt", fileLead, agent->born);
+            sprintf(filename, "%s_gen-%i_edges.txt", fileLead, agent->born);
             agent->saveEdgeList(filename);
         }
         agent = agent->ancestor;
