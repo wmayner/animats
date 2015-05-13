@@ -63,23 +63,21 @@ void Agent::inherit(Agent *parent, int generation) {
             genome[i] = parent->genome[i];
         }
     }
-    if (MUTATION_RATE != 0.0) {
-        if ((randDouble < 0.05) && ((int)genome.size() < 10000)) {
-            int w = (15 + rand()) & 511;
-            // Duplication
-            int s = rand() % ((int)genome.size() - w);
-            int o = rand() % (int)genome.size();
-            buffer.clear();
-            buffer.insert(buffer.begin(), genome.begin() + s,
-                    genome.begin() + s + w);
-            genome.insert(genome.begin() + o, buffer.begin(), buffer.end());
-        }
-        if ((randDouble < 0.02) && ((int)genome.size() > 1000)) {
-            // Deletion
-            int w = (15 + rand()) & 511;
-            int s = rand() % ((int)genome.size() - w);
-            genome.erase(genome.begin() + s, genome.begin() + s + w);
-        }
+    if ((randDouble < 0.05) && ((int)genome.size() < 10000)) {
+        int w = (15 + rand()) & 511;
+        // Duplication
+        int s = rand() % ((int)genome.size() - w);
+        int o = rand() % (int)genome.size();
+        buffer.clear();
+        buffer.insert(buffer.begin(), genome.begin() + s,
+                genome.begin() + s + w);
+        genome.insert(genome.begin() + o, buffer.begin(), buffer.end());
+    }
+    if ((randDouble < 0.02) && ((int)genome.size() > 1000)) {
+        // Deletion
+        int w = (15 + rand()) & 511;
+        int s = rand() % ((int)genome.size() - w);
+        genome.erase(genome.begin() + s, genome.begin() + s + w);
     }
     setupPhenotype();
     fitness = 0.0;
