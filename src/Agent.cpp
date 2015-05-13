@@ -127,17 +127,23 @@ void Agent::loadAgent(char* filename) {
 }
 
 void Agent::saveTPM(FILE *f) {
-    fprintf(f,"0_t0,1_t0,2_t0,3_t0,4_t0,5_t0,6_t0,7_t0,,0_t1,1_t1,2_t1,3_t1,4_t1,5_t1,6_t1,7_t1\n");
+    fprintf(f,"past_state,current_state\n");
+    // For all possible states...
     for (int i = 0; i < NUM_STATES; i++) {
-        for (int j = 0; j < NUM_NODES; j++) {
-            fprintf(f, "%i,", (i >> j) & 1);
-            states[j]= (i>> j) & 1;
-        }
+        // Set the animat to that state
+        for (int j = 0; j < NUM_NODES; j++)
+            states[j]= (i >> j) & 1;
+        // Write that state to the first column
+        for (int j = 0; j < (NUM_NODES - 1); j++)
+            fprintf(f, "%i", (i >> j) & 1);
+        fprintf(f, "%i,", (i >> (NUM_NODES - 1)) & 1);
+        // Get the next state
         updateStates();
-        for (int j = 0; j < NUM_NODES; j++) {
-            fprintf(f, ",%i", states[j]);
+        // Write that state to the second column
+        for (int j = 0; j < (NUM_NODES - 1); j++) {
+            fprintf(f, "%i", states[j]);
         }
-        fprintf(f, "\n");
+        fprintf(f, "%i\n", (i >> (NUM_NODES - 1)) & 1);
     }
 }
 
