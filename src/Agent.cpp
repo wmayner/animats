@@ -175,7 +175,7 @@ void Agent::saveEdgeList(char *filename) {
     FILE *f = fopen(filename, "w+t");
     fprintf(f, "source,target\n");
     for (int i = 0; i < (int)hmmus.size(); i++) {
-        for (int j=0; j < (int)hmmus[i]->ins.size(); j++) {
+        for (int j = 0; j < (int)hmmus[i]->ins.size(); j++) {
             for (int k = 0; k < (int)hmmus[i]->outs.size(); k++) {
                 fprintf(f, "%i,%i\n", hmmus[i]->ins[j], hmmus[i]->outs[k]);
             }
