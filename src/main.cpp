@@ -86,10 +86,10 @@ int main(int argc, char *argv[]) {
                 agent[i]->fitness *= agent[i]->fitnesses[j];
             if (repeats <= 1) {
               // Larissa: This for one repeat
-              agent[i]->fitness = pow(FITNESS_MULTIPLIER, agent[i]->fitness);
+              agent[i]->fitness = pow(FITNESS_BASE, agent[i]->fitness);
             } else {
               agent[i]->fitness = pow(agent[i]->fitness, (1.0 / repeats));
-              agent[i]->fitness = pow(FITNESS_MULTIPLIER, agent[i]->fitness);
+              agent[i]->fitness = pow(FITNESS_BASE, agent[i]->fitness);
             }
             if (agent[i]->fitness > maxFitness) {
                 who = i;
