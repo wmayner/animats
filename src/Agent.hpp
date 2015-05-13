@@ -38,8 +38,7 @@ class Agent {
     void resetBrain();
     void updateStates();
     void loadAgent(char* filename);
-    void saveLogicTable(FILE *f);
-    void saveLogicTableSingleAnimat(FILE *f);
+    void saveTPM(FILE *f);
     void appendGenomeToFile(FILE *f);
     void saveEdgeList(char *filename);
 };
