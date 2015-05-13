@@ -40,7 +40,7 @@ class Agent {
     void loadAgent(char* filename);
     void saveLogicTable(FILE *f);
     void saveLogicTableSingleAnimat(FILE *f);
-    void saveGenome(FILE *f);
+    void appendGenomeToFile(FILE *f);
     void saveEdgeList(char *filename);
 };
 

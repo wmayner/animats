@@ -162,7 +162,8 @@ void Agent::saveLogicTableSingleAnimat(FILE *f) {
     }
 }
 
-void Agent::saveGenome(FILE *f) {
+void Agent::appendGenomeToFile(FILE *f) {
+    fprintf(f, "%i,", born);
     for (int i = 0; i < (int)genome.size() - 1; i++) {
         fprintf(f, "%i ", genome[i]);
     }

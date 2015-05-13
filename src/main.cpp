@@ -27,7 +27,7 @@ int generation = 0;
 int repeats = 1;
 double sensorNoise = 0.0;
 
-void saveLOD(Agent *agent, FILE *statsFile, FILE *genomeFile);
+void saveLODandGenomes(Agent *agent, FILE *statsFile, FILE *genomeFile);
 
 int main(int argc, char *argv[]) {
     vector<Agent*> agent;
@@ -125,11 +125,11 @@ int main(int argc, char *argv[]) {
     cout << "Finished simulating " << NUM_GENERATIONS << " generations. Elapsed time: " << (endTime - startTime) << " seconds." << endl;
     // Larissa: set sensor noise to 0 for analysis
     makeFullAnalysis(game, agent[0], argv[4], 0);
-    saveLOD(agent[0], LODFile, genomeFile);
+    saveLODandGenomes(agent[0], LODFile, genomeFile);
     return 0;
 }
 
-void saveLOD(Agent *agent, FILE *LODFile, FILE *genomeFile) {
+void saveLODandGenomes(Agent *agent, FILE *LODFile, FILE *genomeFile) {
     vector<Agent*> lineage;
     Agent *localAgent = agent;
     while (localAgent != NULL) {
@@ -140,7 +140,9 @@ void saveLOD(Agent *agent, FILE *LODFile, FILE *genomeFile) {
     // of descent, saving stats and genome every (LOD_RECORD_INTERVAL)th
     // generation.
     //
-    // Write CSV field names
+    // Write CSV field names for LOD file
+    fprintf(genomeFile, "gen,genome\n");
+    // Write CSV field names for LOD file
     fprintf(LODFile, "gen,correct,incorrect");
     Agent *firstAgent = lineage[lineage.size() - 1];
     for (int i = 0; i < (int)firstAgent->numCorrectByPattern.size(); i++) {
@@ -158,8 +160,8 @@ void saveLOD(Agent *agent, FILE *LODFile, FILE *genomeFile) {
                 fprintf(LODFile, ",%i", agent->numCorrectByPattern[i]);
             }
             fprintf(LODFile, "\n");
-            // Append genome to genome file
-            agent->saveGenome(genomeFile);
+            // Record genome
+            agent->appendGenomeToFile(genomeFile);
         }
     }
 }
