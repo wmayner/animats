@@ -27,7 +27,6 @@ class Game {
     void applyNoise(Agent *agent, double sensorNoise);
     double agentDependentRandDouble(void);
     int agentDependentRandInt(void);
-    int nowUpdate;
 };
 
 #endif  // SRC_GAME_H_

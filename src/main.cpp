@@ -23,16 +23,16 @@ using std::map;
 using std::endl;
 using std::cout;
 
-double perSiteMutationRate = 0.005;
-int generation = 0;
-int repeats = 1;
-int numAgents = 100;
 int numGenerations = 60000;
-char trialName[1000];
+double perSiteMutationRate = 0.005;
+int numAgents = 100;
 double sensorNoise = 0.0;
 
-void saveLOD(Agent *agent, FILE *statsFile, FILE *genomeFile);
+char trialName[1000];
+int generation = 0;
+int repeats = 1;
 
+void saveLOD(Agent *agent, FILE *statsFile, FILE *genomeFile);
 
 int main(int argc, char *argv[]) {
     vector<Agent*> agent;
@@ -53,9 +53,6 @@ int main(int argc, char *argv[]) {
     }
     agent.resize(numAgents);
     game = new Game(argv[1]);
-
-    // Larissa
-    game->nowUpdate = floor(numGenerations / 2);
 
     sensorNoise = atof(argv[6]);
     masterAgent = new Agent;
@@ -80,11 +77,6 @@ int main(int argc, char *argv[]) {
                 agent[i]->fitnesses.push_back((float)agent[i]->correct);
             }
         }
-        if (generation == game->nowUpdate) {
-            for (i = 0; i < (int)agent.size(); i++) {
-                makeSingleAgentAnalysis(agent[i], argv[4], i);
-            }
-        }
 
         maxFitness = 0.0;
 
@@ -94,10 +86,10 @@ int main(int argc, char *argv[]) {
                 agent[i]->fitness *= agent[i]->fitnesses[j];
             if (repeats <= 1) {
               // Larissa: This for one repeat
-              agent[i]->fitness = pow(1.02, agent[i]->fitness);
+              agent[i]->fitness = pow(FITNESS_MULTIPLIER, agent[i]->fitness);
             } else {
               agent[i]->fitness = pow(agent[i]->fitness, (1.0 / repeats));
-              agent[i]->fitness = pow(1.02, agent[i]->fitness);
+              agent[i]->fitness = pow(FITNESS_MULTIPLIER, agent[i]->fitness);
             }
             if (agent[i]->fitness > maxFitness) {
                 who = i;

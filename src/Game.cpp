@@ -186,12 +186,6 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                     }
                     stateTransitions[1].push_back(current_state);
 
-                    // TODO(wmayner) parameterize this
-                    // Larissa: limit to one motor
-                    // agent->states[7]=0;
-                    // if (agent->born < nowUpdate) {
-                    //     agent->states[7] = 0;
-                    // }
                     // TODO(wmayner) switch motors and cases to be less
                     // confusing
                     action = agent->states[6] + (agent->states[7] << 1);

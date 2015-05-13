@@ -20,7 +20,7 @@
 #define SCRAMBLE_WORLD false
 
 // Evolution parameters
-#define FITNESS_MULTIPLIER 1.01
+#define FITNESS_MULTIPLIER 1.02
 
 #define randDouble ((double)rand() / (double)RAND_MAX)
 
