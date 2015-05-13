@@ -60,7 +60,7 @@ int main(int argc, char *argv[]) {
     masterAgent->setupPhenotype();
     for (i = 0; i < (int)agent.size(); i++) {
         agent[i] = new Agent;
-        agent[i]->inherit(masterAgent, 0.01, 0);
+        agent[i]->inherit(masterAgent, perSiteMutationRate, generation);
     }
     nextGen.resize(agent.size());
     masterAgent->nrPointingAtMe--;
