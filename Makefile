@@ -27,6 +27,6 @@ run: all
 	# 4. The name of the trial
 	# 5. The random seed (positive integer of any size)
 	# 6. Noise level (float between 0 and 1)
-	./build/main.o $(PARAM_FILE) $(RESULT_DIR)/seed-$(SEED)_LOD.csv $(RESULT_DIR)/seed-$(SEED)_GEN.txt $(RESULT_DIR)/seed-$(SEED) $(SEED) 0
+	./build/main.o $(PARAM_FILE) $(RESULT_DIR)/seed-$(SEED)_LOD.csv $(RESULT_DIR)/seed-$(SEED)_genomes.txt $(RESULT_DIR)/seed-$(SEED) $(SEED) 0
 
 .PHONY: clean all
