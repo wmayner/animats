@@ -15,6 +15,8 @@ clean:
 	$(RM) $(BUILD)
 
 
+PARAM_FILE=parameters/basic0.txt
+RESULT_DIR=results/current
 SEED=0
 
 run: all
@@ -25,6 +27,6 @@ run: all
 	# 4. The name of the trial
 	# 5. The random seed (positive integer of any size)
 	# 6. Noise level (float between 0 and 1)
-	./build/main.o parameters/basic0.txt results/seed-$(SEED)_LOD.csv results/seed-$(SEED)_GEN.txt results/seed-$(SEED) $(SEED) 0
+	./build/main.o $(PARAM_FILE) $(RESULT_DIR)/seed-$(SEED)_LOD.csv $(RESULT_DIR)/seed-$(SEED)_GEN.txt $(RESULT_DIR)/seed-$(SEED) $(SEED) 0
 
 .PHONY: clean all
