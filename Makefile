@@ -14,6 +14,9 @@ all:
 clean:
 	$(RM) $(BUILD)
 
+
+SEED=0
+
 run: all
 	# Run the program with 5 arguments:
 	# 1. File describing the task for the animats to do
@@ -22,6 +25,6 @@ run: all
 	# 4. The name of the trial
 	# 5. The random seed (positive integer of any size)
 	# 6. Noise level (float between 0 and 1)
-	./build/main.o parameters/basic0.txt results/trial0_LOD.txt results/trial0_GEN.txt results/trial0 0 0
+	./build/main.o parameters/basic0.txt results/trial$(SEED)_LOD.txt results/trial$(SEED)_GEN.txt results/trial$(SEED) $(SEED) 0
 
 .PHONY: clean all
