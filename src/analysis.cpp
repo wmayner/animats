@@ -32,10 +32,10 @@ void makeFullAnalysis(Game *game, Agent *agent, char *fileLead, double
             table = game->executeGame(agent, sensorNoise);
             for (j = 0; j < (int)table[0].size(); j++)  {
                 for (i = 0; i < NUM_NODES - 1; i++)
-                    fprintf(f, "%i ", (table[0][j] >> i) & 1);
+                    fprintf(f, "%i", (table[0][j] >> i) & 1);
                 fprintf(f, "%i,", (table[0][j] >> i) & 1);
                 for (i = 0; i < NUM_NODES; i++) {
-                    fprintf(f, "%i ", (table[1][j] >> i) & 1);
+                    fprintf(f, "%i", (table[1][j] >> i) & 1);
                 }
                 fprintf(f, "\n");
             }
