@@ -47,9 +47,12 @@ int main(int argc, char *argv[]) {
         srand(getpid());
     }
     agent.resize(NUM_AGENTS);
+    nextGen.resize(agent.size());
+
     game = new Game(argv[1]);
 
     sensorNoise = atof(argv[6]);
+
     masterAgent = new Agent;
     masterAgent->setupEmptyAgent(5000);
     masterAgent->setupPhenotype();
@@ -57,9 +60,9 @@ int main(int argc, char *argv[]) {
         agent[i] = new Agent;
         agent[i]->inherit(masterAgent, generation);
     }
-    nextGen.resize(agent.size());
-    masterAgent->nrPointingAtMe--;
+
     cout << "Setup complete." << endl;
+
     int startTime = time(NULL);
     while (generation < NUM_GENERATIONS) {
         for (i = 0; i < (int)agent.size(); i++) {
@@ -96,6 +99,8 @@ int main(int argc, char *argv[]) {
             (double)maxFitness << " [correct/incorrect] " <<
             agent[who]->correct << "/" << agent[who]->incorrect << endl;
 
+        generation++;
+
         // Roulette-wheel selection
         // See http://en.wikipedia.org/wiki/Fitness_proportionate_selection
         for (i = 0; i < (int)agent.size(); i++) {
@@ -114,8 +119,8 @@ int main(int argc, char *argv[]) {
             agent[i] = nextGen[i];
         }
         agent = nextGen;
-        generation++;
     }
+
     int endTime = time(NULL);
     cout << "Finished simulating " << NUM_GENERATIONS << " generations. Elapsed time: " << (endTime - startTime) << " seconds." << endl;
     // Larissa: set sensor noise to 0 for analysis
@@ -142,9 +147,10 @@ void saveLOD(Agent *agent, FILE *LODFile, FILE *genomeFile) {
         fprintf(LODFile, ",correct_pattern_%i", i);
     }
     fprintf(LODFile, "\n");
-    for (int gen = (int)lineage.size() - 1; gen >= 0; gen--) {
+    // Skip final population whose fitness hasn't been evaluated
+    for (int gen = (int)lineage.size() - 2; gen >= 0; gen--) {
         agent = lineage[gen];
-        if (((gen + 1) % LOD_RECORD_INTERVAL) == 0) {
+        if ((agent->born % LOD_RECORD_INTERVAL) == 0) {
             // Append data to LOD file
             fprintf(LODFile, "%i,%i,%i", agent->born, agent->correct,
                 agent->incorrect);
