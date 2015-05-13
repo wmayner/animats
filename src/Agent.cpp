@@ -163,18 +163,20 @@ void Agent::saveLogicTableSingleAnimat(FILE *f) {
 }
 
 void Agent::saveGenome(FILE *f) {
-    for (int i = 0; i < (int)genome.size(); i++) {
-        fprintf(f, "%i   ", genome[i]);
+    for (int i = 0; i < (int)genome.size() - 1; i++) {
+        fprintf(f, "%i ", genome[i]);
     }
+    fprintf(f, "%i", genome[genome.size() - 1]);
     fprintf(f, "\n");
 }
 
 void Agent::saveEdgeList(char *filename) {
     FILE *f = fopen(filename, "w+t");
+    fprintf(f, "source,target\n");
     for (int i = 0; i < (int)hmmus.size(); i++) {
         for (int j=0; j < (int)hmmus[i]->ins.size(); j++) {
             for (int k = 0; k < (int)hmmus[i]->outs.size(); k++) {
-                fprintf(f, "%i   %i\n", hmmus[i]->ins[j], hmmus[i]->outs[k]);
+                fprintf(f, "%i,%i\n", hmmus[i]->ins[j], hmmus[i]->outs[k]);
             }
         }
     }
