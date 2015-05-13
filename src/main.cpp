@@ -101,6 +101,8 @@ int main(int argc, char *argv[]) {
             (double)maxFitness << " [correct/incorrect] " <<
             agent[who]->correct << "/" << agent[who]->incorrect << endl;
 
+        // Roulette-wheel selection
+        // See http://en.wikipedia.org/wiki/Fitness_proportionate_selection
         for (i = 0; i < (int)agent.size(); i++) {
             Agent *d;
             d = new Agent;
