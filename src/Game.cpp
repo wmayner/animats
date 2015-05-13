@@ -224,25 +224,21 @@ vector< vector<int> > Game::executeGame(Agent* agent, double sensorNoise, int
                     }
                 }
 
-                // Update fitness
+                // Update hitcounts
                 // TODO(wmayner) Make the alternating catch/avoid stuff
                 // explicit and read it from the file
                 if ((patternIndex & 1) == 0) {
                     if (hit) {
                         agent->correct++;
-                        agent->fitness *= FITNESS_MULTIPLIER;
                         agent->numCorrectByPattern[patternIndex]++;
                     } else {
-                        agent->fitness /= FITNESS_MULTIPLIER;
                         agent->incorrect++;
                     }
                 } else {
                     if (hit) {
                         agent->incorrect++;
-                        agent->fitness /= FITNESS_MULTIPLIER;
                     } else {
                         agent->correct++;
-                        agent->fitness *= FITNESS_MULTIPLIER;
                         agent->numCorrectByPattern[patternIndex]++;
                     }
                 }
