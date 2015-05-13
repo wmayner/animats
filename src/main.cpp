@@ -36,9 +36,9 @@ int main(int argc, char *argv[]) {
     int i, j, who = 0;
     Game *game;
     double maxFitness;
-    FILE *LOD;
+    FILE *LODFile;
     FILE *genomeFile;
-    LOD = fopen(argv[2], "w+t");
+    LODFile = fopen(argv[2], "w+t");
     genomeFile = fopen(argv[3], "w+t");
     int localSeed = atoi(argv[5]);
     if (localSeed != -1) {
@@ -118,40 +118,41 @@ int main(int argc, char *argv[]) {
     }
     int endTime = time(NULL);
     cout << "Finished simulating " << NUM_GENERATIONS << " generations. Elapsed time: " << (endTime - startTime) << " seconds." << endl;
-    // Larissa: put noise to 0 for analysis
+    // Larissa: set sensor noise to 0 for analysis
     makeFullAnalysis(game, agent[0], argv[4], 0);
-    saveLOD(agent[0], LOD, genomeFile);
+    saveLOD(agent[0], LODFile, genomeFile);
     return 0;
 }
 
-void saveLOD(Agent *agent, FILE *statsFile, FILE *genomeFile) {
-    vector<Agent*> list;
+void saveLOD(Agent *agent, FILE *LODFile, FILE *genomeFile) {
+    vector<Agent*> lineage;
     Agent *localAgent = agent;
     while (localAgent != NULL) {
-        list.push_back(localAgent);
+        lineage.push_back(localAgent);
         localAgent = localAgent->ancestor;
     }
     // Start with the most-evolved animat and trace backwards through the line
     // of descent, saving stats and genome every (LOD_RECORD_INTERVAL)th
     // generation.
     //
-    // Write CSV column headings
-    fprintf(statsFile, "gen_born,correct,incorrect",
-        agent->born, agent->correct, agent->incorrect);
-    for (int i = 0; i < (int)agent->numCorrectByPattern.size(); i++) {
-        fprintf(statsFile, ",correct_pattern_%i", i);
+    // Write CSV field names
+    fprintf(LODFile, "gen,correct,incorrect");
+    Agent *firstAgent = lineage[lineage.size() - 1];
+    for (int i = 0; i < (int)firstAgent->numCorrectByPattern.size(); i++) {
+        fprintf(LODFile, ",correct_pattern_%i", i);
     }
-    fprintf(statsFile, "\n");
-    for (int agentIndex = (int)list.size() - 1; agentIndex >= 0; agentIndex--) {
-        agent = list[agentIndex];
-        if ((agent->born & LOD_RECORD_INTERVAL) == 0) {
-            // Write data
-            fprintf(statsFile, "%i,%i,%i", agent->born, agent->correct,
+    fprintf(LODFile, "\n");
+    for (int gen = (int)lineage.size() - 1; gen >= 0; gen--) {
+        agent = lineage[gen];
+        if (((gen + 1) % LOD_RECORD_INTERVAL) == 0) {
+            // Append data to LOD file
+            fprintf(LODFile, "%i,%i,%i", agent->born, agent->correct,
                 agent->incorrect);
             for (int i = 0; i < (int)agent->numCorrectByPattern.size(); i++) {
-                fprintf(statsFile, ",%i", agent->numCorrectByPattern[i]);
+                fprintf(LODFile, ",%i", agent->numCorrectByPattern[i]);
             }
-            fprintf(statsFile, "\n");
+            fprintf(LODFile, "\n");
+            // Append genome to genome file
             agent->saveGenome(genomeFile);
         }
     }
