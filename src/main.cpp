@@ -132,19 +132,26 @@ void saveLOD(Agent *agent, FILE *statsFile, FILE *genomeFile) {
         localAgent = localAgent->ancestor;
     }
     // Start with the most-evolved animat and trace backwards through the line
-    // of descent
+    // of descent, saving stats and genome every (LOD_RECORD_INTERVAL)th
+    // generation.
+    // Format of resulting stats file:
     for (int agentIndex = (int)list.size() - 1; agentIndex > 0; agentIndex--) {
         agent = list[agentIndex];
         if ((agent->born & LOD_RECORD_INTERVAL) == 0) {
-            // Larissa: set noise to 0 for analysis
-            fprintf(statsFile, "%i   %i  %i", agent->born, agent->correct,
-                    agent->incorrect);
+            // Write CSV column headings
+            fprintf(statsFile, "gen, correct, incorrect, ",
+                agent->born, agent->correct, agent->incorrect);
             for (int i = 0; i < (int)agent->numCorrectByPattern.size(); i++) {
-                fprintf(statsFile, " %i", agent->numCorrectByPattern[i]);
+                fprintf(statsFile, ", correct_pattern_%i", i);
             }
             fprintf(statsFile, "\n");
-            // TODO(wmayner) don't think we need the genome file; apparently
-            // nobody understands it anyway :'(
+            // Write data
+            fprintf(statsFile, "%i, %i, %i,", agent->born, agent->correct,
+                agent->incorrect);
+            for (int i = 0; i < (int)agent->numCorrectByPattern.size(); i++) {
+                fprintf(statsFile, "%i", agent->numCorrectByPattern[i]);
+            }
+            fprintf(statsFile, "\n");
             agent->saveGenome(genomeFile);
         }
     }
