@@ -101,7 +101,8 @@ int main(int argc, char *argv[]) {
 
         generation++;
 
-        // Roulette-wheel selection
+        // Variant of roulette-wheel selection that uses the maximum fitness
+        // rather than the average.
         // See http://en.wikipedia.org/wiki/Fitness_proportionate_selection
         for (i = 0; i < (int)agent.size(); i++) {
             Agent *d;
