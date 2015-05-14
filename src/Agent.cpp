@@ -63,8 +63,9 @@ void Agent::inherit(Agent *parent, int generation) {
             genome[i] = parent->genome[i];
         }
     }
-    if ((randDouble < 0.05) && ((int)genome.size() < 10000)) {
-        int w = (15 + rand()) & 511;
+    if ((randDouble < DUPLICATION_PROB) &&
+            ((int)genome.size() < MAX_GENOME_LENGTH)) {
+        int w = (MIN_DUP_DEL_WIDTH + rand()) & MAX_DUP_DEL_WIDTH;
         // Duplication
         int s = rand() % ((int)genome.size() - w);
         int o = rand() % (int)genome.size();
@@ -73,9 +74,10 @@ void Agent::inherit(Agent *parent, int generation) {
                 genome.begin() + s + w);
         genome.insert(genome.begin() + o, buffer.begin(), buffer.end());
     }
-    if ((randDouble < 0.02) && ((int)genome.size() > 1000)) {
+    if ((randDouble < DELETION_PROB) &&
+            ((int)genome.size() > MIN_GENOME_LENGTH)) {
         // Deletion
-        int w = (15 + rand()) & 511;
+        int w = (MIN_DUP_DEL_WIDTH + rand()) & MAX_DUP_DEL_WIDTH;
         int s = rand() % ((int)genome.size() - w);
         genome.erase(genome.begin() + s, genome.begin() + s + w);
     }

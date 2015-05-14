@@ -17,6 +17,12 @@
 // Probability of each indiviudal nucleotide changed to random one
 #define MUTATION_RATE 0.005
 #define FITNESS_BASE 1.02
+#define DUPLICATION_PROB 0.05
+#define DELETION_PROB 0.02
+#define MAX_GENOME_LENGTH 10000
+#define MIN_GENOME_LENGTH 1000
+#define MIN_DUP_DEL_WIDTH 15
+#define MAX_DUP_DEL_WIDTH 511
 
 // World parameters
 // ----------------
