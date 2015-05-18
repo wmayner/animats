@@ -129,7 +129,7 @@ int main(int argc, char *argv[]) {
     cout << "Finished simulating " << NUM_GENERATIONS << " generations. Elapsed time: " << (endTime - startTime) << " seconds." << endl;
     // Larissa: set sensor noise to 0 for analysis
     makeFullAnalysis(game, agent[0], argv[4], 0);
-    saveLODandGenomes(agent[0], LODFile, genomeFile);
+    saveLODandGenomes(agent[who], LODFile, genomeFile);
     return 0;
 }
 
