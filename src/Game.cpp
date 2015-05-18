@@ -25,7 +25,7 @@ int randInt(int i) {
 }
 
 int wrap(int i) {
-    return i & (WORLD_WIDTH - 1)
+    return i & (WORLD_WIDTH - 1);
 }
 
 Game::Game(char* filename) {
