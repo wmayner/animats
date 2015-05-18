@@ -10,10 +10,10 @@ HMMU::HMMU(vector<unsigned char> &genome, int start) {
     outs.clear();
 
     // This keeps track of where we are in the genome.
-    int scan = (start + 2) % genome.size();
+    int scan = (start + 2) % (int)genome.size();
 
-    numInputs = 1 + (genome[(scan++) % genome.size()] & 3);
-    numOutputs = 1 + (genome[(scan++) % genome.size()] & 3);
+    numInputs = 1 + (genome[(scan++) % (int)genome.size()] & 3);
+    numOutputs = 1 + (genome[(scan++) % (int)genome.size()] & 3);
     ins.resize(numInputs);
     outs.resize(numOutputs);
 
@@ -41,7 +41,7 @@ HMMU::HMMU(vector<unsigned char> &genome, int start) {
             int largestValueInRowIndex = 0;
             for (int j = 0; j < (N); j++) {
                 hmm[i][j] = 0;
-                int currentValue = genome[(scan + j + (N * i)) % genome.size()];
+                int currentValue = genome[(scan + j + (N * i)) % (int)genome.size()];
                 if (currentValue > largestValueInRow) {
                     largestValueInRow = currentValue;
                     largestValueInRowIndex = j;
@@ -54,7 +54,7 @@ HMMU::HMMU(vector<unsigned char> &genome, int start) {
         for (int i = 0; i < M; i++) {
             hmm[i].resize(N);
             for (int j = 0; j < N; j++) {
-                hmm[i][j] = genome[(scan + j + (N * i)) % genome.size()];
+                hmm[i][j] = genome[(scan + j + (N * i)) % (int)genome.size()];
                 // Don't allow zero-entries
                 // TODO(wmayner) why?
                 if (hmm[i][j] == 0) hmm[i][j] = 1;
