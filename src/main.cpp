@@ -115,12 +115,13 @@ int main(int argc, char *argv[]) {
             d->inherit(agent[j], generation);
             nextGen[i] = d;
         }
+        // Delete lines of descent that died out.
         for (i = 0; i < (int)agent.size(); i++) {
             agent[i]->nrPointingAtMe--;
             if (agent[i]->nrPointingAtMe == 0)
                 delete agent[i];
-            agent[i] = nextGen[i];
         }
+        // Replace current population with offspring.
         agent = nextGen;
     }
 
