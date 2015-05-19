@@ -40,5 +40,6 @@
 // Analysis parameters
 // -------------------
 #define LOD_RECORD_INTERVAL 500
+#define PRINT_INTERVAL 100
 
 #endif  // SRC_CONSTANTS_H_

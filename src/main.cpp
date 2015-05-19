@@ -95,7 +95,7 @@ int main(int argc, char *argv[]) {
             }
         }
 
-        if (generation % LOD_RECORD_INTERVAL == 0) {
+        if (generation % PRINT_INTERVAL == 0) {
           cout << "Generation " << generation << ": [fitness] " <<
             (double)maxFitness << " [correct/incorrect] " <<
             agent[who]->correct << "/" << agent[who]->incorrect << endl;
