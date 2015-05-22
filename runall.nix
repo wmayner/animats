@@ -1,9 +1,11 @@
 #!/bin/bash
 
 make
-cd results/current
 
-for ((seed=0; seed < 1; seed++))
+PARAM_FILE=parameters/basic0.txt
+
+for ((seed=32; seed < 64; seed++))
 do
-  ../../build/main.o ../../parameters/basic0.txt "seed-${seed}_LOD.csv" "seed-${seed}_GEN.txt" "seed-${seed}" ${seed} 0 2>&1 | tee "seed-"$seed"_output.log" &
+  result_dir="results/current/seed-$seed"
+  ./build/main.o $PARAM_FILE "$result_dir/LOD.csv" "$result_dir/genomes.csv" "$result_dir/" $seed 0 2>&1 | tee "$result_dir/output.log" &
 done
