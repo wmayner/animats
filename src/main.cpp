@@ -30,7 +30,6 @@ void saveLODandGenomes(Agent *agent, FILE *statsFile, FILE *genomeFile);
 
 int main(int argc, char *argv[]) {
     Game *game;
-    double maxFitness;
     FILE *LODFile = fopen(argv[2], "w+t");
     FILE *genomeFile = fopen(argv[3], "w+t");
 
@@ -70,6 +69,8 @@ int main(int argc, char *argv[]) {
     int startTime = time(NULL);
 
     int who = 0;
+    double maxFitness = 1.0;
+
     while (generation < NUM_GENERATIONS + 1) {
         // Variant of roulette-wheel selection that uses the maximum fitness
         // rather than the average.
@@ -96,10 +97,7 @@ int main(int argc, char *argv[]) {
 
         // Fitness evaluation.
         for (int i = 0; i < (int)agent.size(); i++) {
-            agent[i]->fitness = 0.0;
             agent[i]->fitnesses.clear();
-        }
-        for (int i = 0; i < (int)agent.size(); i++) {
             for (int j = 0; j < repeats; j++) {
                 game->executeGame(agent[i], sensorNoise, j);
                 agent[i]->fitnesses.push_back((float)agent[i]->correct);

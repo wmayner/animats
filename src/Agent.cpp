@@ -7,6 +7,7 @@
 Agent::Agent() {
     nrPointingAtMe = 1;
     ancestor = NULL;
+    fitness = 0.0;
     for (int i = 0; i < NUM_NODES; i++) {
         states[i] = 0;
         newStates[i] = 0;
@@ -81,7 +82,6 @@ void Agent::inherit(Agent *parent, int generation) {
         genome.erase(genome.begin() + s, genome.begin() + s + w);
     }
     setupPhenotype();
-    fitness = 0.0;
 }
 
 void Agent::setupPhenotype() {
