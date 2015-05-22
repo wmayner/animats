@@ -69,7 +69,7 @@ int main(int argc, char *argv[]) {
 
     int startTime = time(NULL);
 
-    int who;
+    int who = 0;
     while (generation < NUM_GENERATIONS + 1) {
         // Variant of roulette-wheel selection that uses the maximum fitness
         // rather than the average.
