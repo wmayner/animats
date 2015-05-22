@@ -64,6 +64,8 @@ int main(int argc, char *argv[]) {
     for (int i = 0; i < (int)agent.size(); i++) {
         agent[i] = new Agent;
         agent[i]->inherit(masterAgent, generation);
+        // Set fitness to 1 so agents will be selected in the first selection.
+        agent[i]->fitness = 1.0;
     }
 
     int startTime = time(NULL);
