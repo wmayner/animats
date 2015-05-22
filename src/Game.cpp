@@ -55,11 +55,9 @@ int Game::agentDependentRandInt(void) {
 void Game::applyNoise(Agent *agent, double sensorNoise) {
     // Larissa: If I don't have noise in evaluation, then I can just use random
     // numbers always
-    // if (agentDependentRandDouble() < sensorNoise) {
     if (randDouble < sensorNoise) {
         agent->states[0] = !agent->states[0];
     }
-    // if (agentDependentRandDouble() < sensorNoise)
     if (randDouble < sensorNoise) {
         agent->states[1] = !agent->states[1];
     }
