@@ -4,7 +4,6 @@
 
 #include "Agent.hpp"
 
-
 Agent::Agent() {
     nrPointingAtMe = 1;
     ancestor = NULL;
@@ -129,23 +128,23 @@ void Agent::loadAgent(char* filename) {
 }
 
 void Agent::saveTPM(FILE *f) {
-    fprintf(f,"past_state,current_state\n");
+    fprintf(f, "past_state,current_state\n");
     // For all possible states...
-    for (int i = 0; i < NUM_STATES; i++) {
+    for (int state = 0; state < NUM_STATES; state++) {
         // Set the animat to that state
         for (int j = 0; j < NUM_NODES; j++)
-            states[j]= (i >> j) & 1;
+            states[j] = (state >> j) & 1;
         // Write that state to the first column
         for (int j = 0; j < (NUM_NODES - 1); j++)
-            fprintf(f, "%i", (i >> j) & 1);
-        fprintf(f, "%i,", (i >> (NUM_NODES - 1)) & 1);
+            fprintf(f, "%i", (state >> j) & 1);
+        fprintf(f, "%i,", (state >> (NUM_NODES - 1)) & 1);
         // Get the next state
         updateStates();
         // Write that state to the second column
         for (int j = 0; j < (NUM_NODES - 1); j++) {
             fprintf(f, "%i", states[j]);
         }
-        fprintf(f, "%i\n", (i >> (NUM_NODES - 1)) & 1);
+        fprintf(f, "%i\n", (state >> (NUM_NODES - 1)) & 1);
     }
 }
 
