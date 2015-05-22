@@ -71,6 +71,9 @@ int main(int argc, char *argv[]) {
     int who = 0;
     double maxFitness = 1.0;
 
+    cout << "Beginning simulation of " << NUM_GENERATIONS << " generations." <<
+      endl;
+
     while (generation < NUM_GENERATIONS + 1) {
         // Variant of roulette-wheel selection that uses the maximum fitness
         // rather than the average.
@@ -132,7 +135,9 @@ int main(int argc, char *argv[]) {
     }
 
     int endTime = time(NULL);
-    cout << "Finished simulating " << NUM_GENERATIONS << " generations. Elapsed time: " << (endTime - startTime) << " seconds." << endl;
+    cout << "Finished simulating " << NUM_GENERATIONS <<
+      " generations. Elapsed time: " << (endTime - startTime) << " seconds." <<
+      endl;
     // Larissa: set sensor noise to 0 for analysis
     makeFullAnalysis(game, bestAgent, argv[4], 0);
     cout << "Finished doing full analysis." << endl;
