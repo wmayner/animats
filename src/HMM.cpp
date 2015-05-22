@@ -67,12 +67,13 @@ HMMU::HMMU(vector<unsigned char> &genome, int start) {
 void HMMU::update(unsigned char *currentStates, unsigned char *nextStates) {
     // Encode the given states as an integer to index into the TPM
     int pastStateIndex = 0;
-    for (int i = 0; i < (int)ins.size(); i++)
-        pastStateIndex = (pastStateIndex << 1) + ((currentStates[ins[i]]) & 1);
+    for (int i = 0; i < (int)ins.size(); i++) {
+        pastStateIndex = (pastStateIndex << 1) + (currentStates[ins[i]] & 1);
+    }
     // Get the next state
     int nextStateIndex = 0;
     if (DETERMINISTIC) {
-        // Find the index of the 1 in this row
+        // Find the index of the 255 in this row
         while (1 > hmm[pastStateIndex][nextStateIndex]) {
             nextStateIndex++;
         }
