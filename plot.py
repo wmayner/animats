@@ -2,10 +2,13 @@
 # -*- coding: utf-8 -*-
 # plot.py
 
+import os
 import pickle
 import matplotlib.pyplot as plt
 
-with open('data.pkl', 'rb') as f:
+COMPILED_RESULTS_DIR = 'compiled_results'
+
+with open(os.join(COMPILED_RESULTS_DIR, 'correct_counts.pkl'), 'rb') as f:
     data = pickle.load(f)
 n, bins, patches = plt.hist(data, 12, normed=True, facecolor='blue', alpha=0.8)
 
