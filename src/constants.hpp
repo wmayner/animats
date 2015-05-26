@@ -9,7 +9,7 @@
 
 // Simulation parameters
 // ---------------------
-#define NUM_GENERATIONS 30000
+#define NUM_GENERATIONS 60000
 #define NUM_AGENTS 100
 
 // Evolution parameters
@@ -40,6 +40,6 @@
 // Analysis parameters
 // -------------------
 #define LOD_RECORD_INTERVAL 500
-#define PRINT_INTERVAL 100
+#define PRINT_INTERVAL 500
 
 #endif  // SRC_CONSTANTS_H_

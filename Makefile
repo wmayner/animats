@@ -16,7 +16,7 @@ clean:
 
 
 SEED=0
-PARAM_FILE=parameters/1-3-1-3.txt
+PARAM_FILE=parameters/3-4-6-5.txt
 RESULT_DIR=results/current/seed-$(SEED)
 
 run: all
