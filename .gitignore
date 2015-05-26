@@ -1,10 +1,11 @@
 build
-results
 cpplint.py
 matching_emd
 parameters
+__pycache__
 __pyphi_cache__
 pyphi.log
 scratch
 .venv
-data.pkl
+raw_results
+compiled_results
