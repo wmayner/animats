@@ -17,7 +17,7 @@ clean:
 
 SEED=0
 PARAM_FILE=parameters/3-4-6-5.txt
-RESULT_DIR=raw_results/current/seed-$(SEED)
+RESULT_DIR=raw_results/test/seed-$(SEED)
 
 run: all
 	# Run the program with 5 arguments:
