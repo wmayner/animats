@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 
 COMPILED_RESULTS_DIR = 'compiled_results'
 
-with open(os.join(COMPILED_RESULTS_DIR, 'correct_counts.pkl'), 'rb') as f:
+with open(os.path.join(COMPILED_RESULTS_DIR, 'correct_counts.pkl'), 'rb') as f:
     data = pickle.load(f)
 n, bins, patches = plt.hist(data, 12, normed=True, facecolor='blue', alpha=0.8)
 
