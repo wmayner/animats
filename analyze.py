@@ -59,10 +59,11 @@ def plot_correct_counts(input_filepath=CORRECT_COUNTS_FILEPATH):
     correct, ngen = data['correct'], data['ngen']
     n, bins, patches = plt.hist(correct, 20, normed=True, facecolor='blue',
                                 alpha=0.8)
-    plt.xlabel('$\mathrm{Fitness}$')
-    plt.ylabel('$\mathrm{Number\ of\ Animats}$')
+    plt.xlabel('$\mathrm{Fitness}$', fontsize=22)
+    plt.ylabel('$\mathrm{Number\ of\ Animats}$', fontsize=22)
     plt.title('$\mathrm{Histogram\ of\ Animat\ Performance\ after\ '
-              + str(ngen) + '\ generations,\ population\ size\ 100}$')
+              + str(ngen) + '\ generations,\ population\ size\ 100}$',
+              fontsize=22)
     plt.grid(True)
 
     plt.show()
