@@ -131,7 +131,7 @@ int main(int argc, char *argv[]) {
 
         if (generation % PRINT_INTERVAL == 0) {
           cout << "Generation " << generation << ": [fitness] " <<
-            (double)maxFitness << " [correct/incorrect] " <<
+            (double)bestAgent->fitness << " [correct/incorrect] " <<
             bestAgent->correct << "/" << bestAgent->incorrect << endl;
         }
     }
