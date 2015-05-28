@@ -111,10 +111,10 @@ int main(int argc, char *argv[]) {
         maxFitness = 0.0;
         for (int i = 0; i < (int)agent.size(); i++) {
             agent[i]->fitness = 1.0;
+            // Set fitness to the number correct.
             for (int j = 0; j < repeats; j++)
                 agent[i]->fitness *= agent[i]->fitnesses[j];
             if (repeats <= 1) {
-              // Larissa: This for one repeat
               agent[i]->fitness = pow(FITNESS_BASE, agent[i]->fitness);
             } else {
               agent[i]->fitness = pow(agent[i]->fitness, (1.0 / repeats));
