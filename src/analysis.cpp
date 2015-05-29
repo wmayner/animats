@@ -4,6 +4,42 @@
 
 #include "./analysis.hpp"
 
+void saveLODandGenomes(Agent *finalAgent, FILE *LODFile, FILE *genomeFile) {
+    vector<Agent*> lineage;
+    Agent *agent = finalAgent;
+    while (agent != NULL) {
+        lineage.push_back(agent);
+        agent = agent->ancestor;
+    }
+    // Start with the most-evolved animat and trace backwards through the line
+    // of descent, saving stats and genome every (LOD_RECORD_INTERVAL)th
+    // generation.
+    //
+    // Write CSV field names for LOD file
+    fprintf(genomeFile, "gen,genome\n");
+    // Write CSV field names for LOD file
+    fprintf(LODFile, "gen,correct,incorrect");
+    Agent *firstAgent = lineage[lineage.size() - 1];
+    for (int i = 0; i < (int)firstAgent->numCorrectByPattern.size(); i++) {
+        fprintf(LODFile, ",correct_pattern_%i", i);
+    }
+    fprintf(LODFile, "\n");
+    for (int i = (int)lineage.size() - 1; i >= 0; i--) {
+        agent = lineage[i];
+        if ((agent->born % LOD_RECORD_INTERVAL) == 0) {
+            // Append data to LOD file
+            fprintf(LODFile, "%i,%i,%i", agent->born, agent->correct,
+                agent->incorrect);
+            for (int j = 0; j < (int)agent->numCorrectByPattern.size(); j++) {
+                fprintf(LODFile, ",%i", agent->numCorrectByPattern[j]);
+            }
+            fprintf(LODFile, "\n");
+            // Record genome
+            agent->appendGenomeToFile(genomeFile);
+        }
+    }
+}
+
 void makeFullAnalysis(Game *game, Agent *finalAgent, char *fileLead, double
         sensorNoise) {
     char filename[1000];
