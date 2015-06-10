@@ -91,7 +91,6 @@ def plot_correct_counts(input_filepath=CORRECT_COUNTS_FILEPATH,
     plt.title('$\mathrm{OLD\ CODE}$\n$\mathrm{Histogram\ of\ Animat\ '
               'Performance\ after\ ' + str(ngen) +
               '\ generations,\ population\ size\ 100}$', fontsize=22)
-    plt.ylim([60, 130])
     plt.grid(True)
 
     plt.show()
