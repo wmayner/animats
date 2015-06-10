@@ -69,12 +69,12 @@ def plot_lods(input_filepaths=LOD_FILES, avg=True):
         plt.plot(lods[0]['gen'], data.mean(0))
     else:
         for lod in lods:
-            if lod['correct'][-1] == 64:
-                plt.plot(lod['gen'], lod['correct'])
+            plt.plot(lod['gen'], lod['correct'])
     plt.xlabel('$\mathrm{Generation}$', fontsize=22)
     plt.ylabel('$\mathrm{Correct\ trials}$', fontsize=22)
     plt.title('$\mathrm{Animat\ Fitness\ over\ ' + str(ngen) +
               '\ generations,\ population\ size\ 100}$', fontsize=22)
+    plt.ylim([60, 130])
     plt.grid(True)
     plt.show()
 
@@ -84,12 +84,11 @@ def load_correct_counts(input_filepath=CORRECT_COUNTS_FILEPATH):
         return pickle.load(f)
 
 
-def plot_correct_counts(input_filepath=CORRECT_COUNTS_FILEPATH):
-    with open(input_filepath, 'rb') as f:
-        data = pickle.load(f)
+def plot_correct_counts(input_filepath=CORRECT_COUNTS_FILEPATH,
+                        bins=np.arange(64, 128, 2)):
+    data = load_correct_counts(input_filepath)
     correct, ngen = data['correct'], data['ngen']
-    n, bins, patches = plt.hist(correct, 20, normed=True, facecolor='blue',
-                                alpha=0.8)
+    plt.hist(correct, bins, normed=True, alpha=0.5)
     plt.xlabel('$\mathrm{Fitness}$', fontsize=22)
     plt.ylabel('$\mathrm{Number\ of\ Animats}$', fontsize=22)
     plt.title('$\mathrm{Histogram\ of\ Animat\ Performance\ after\ '
